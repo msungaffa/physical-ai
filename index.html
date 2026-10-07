@@ -269,6 +269,86 @@
     footer { border-top: 1px solid var(--line); padding: 40px 0 56px; color: var(--muted); font-size: 0.95rem; }
     footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
 
+    /* ----- 데이터 파이프라인 ----- */
+    .pipe-filter { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .pipe-filter button {
+      font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      padding: 8px 16px; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+    }
+    .pipe-filter button:hover { color: var(--ink); border-color: var(--ink); }
+    .pipe-filter button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+    .pipe-lanes { margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .pipe-lane { border: 1px solid var(--line); border-radius: 18px; padding: 26px 26px 10px; background: var(--surface); }
+    .pipe-lane > h3 { font-size: 1.1rem; }
+    .pipe-lane > p { color: var(--muted); font-size: 0.93rem; margin: 2px 0 14px; }
+    .pipe-steps { list-style: none; counter-reset: pstep; }
+    .pipe-steps li {
+      counter-increment: pstep; position: relative;
+      padding: 14px 0 14px 44px; border-top: 1px solid var(--line);
+      transition: opacity 0.2s ease;
+    }
+    .pipe-steps li::before {
+      content: counter(pstep); position: absolute; left: 0; top: 14px;
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.82rem; font-weight: 800;
+      background: var(--accent-soft); color: var(--accent-dark);
+    }
+    .pipe-lane.post .pipe-steps li::before { background: var(--dark); color: #fff; }
+    .pipe-steps h4 { font-size: 1rem; }
+    .pipe-steps p { color: var(--muted); font-size: 0.92rem; }
+    .pipe-steps .param { margin-top: 4px; font-size: 0.82rem; color: var(--ink); }
+    .pipe-steps .param b { color: var(--accent-dark); font-weight: 700; }
+    .pipe-uses { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .pipe-uses span { font-size: 0.72rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; color: #fff; }
+    .pipe-uses .u-fall { background: var(--lv3); }
+    .pipe-uses .u-obs  { background: var(--lv2); }
+    .pipe-uses .u-fire { background: var(--lv4); }
+    .pipe-steps li.dim { opacity: 0.28; }
+
+    /* 후처리 효과 시연 패널 (기존 히어로 콘솔과 같은 스타일) */
+    .pipe-demo { margin-top: 48px; display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 32px; align-items: center; }
+    .pipe-demo h3 { font-size: 1.25rem; margin-bottom: 8px; line-height: 1.4; }
+    .pipe-demo .copy p { color: var(--muted); }
+    .pipe-toggle { margin-top: 20px; display: inline-flex; border: 1px solid var(--ink); border-radius: 999px; padding: 3px; }
+    .pipe-toggle button {
+      font: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+      border: 0; background: transparent; color: var(--ink); padding: 7px 16px; border-radius: 999px;
+    }
+    .pipe-toggle button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+    .pipe-result { margin-top: 16px; font-weight: 700; }
+    .pipe-result small { display: block; font-weight: 400; color: var(--muted); font-size: 0.88rem; }
+
+    .pipe-console { background: var(--dark); color: #E6ECF7; border-radius: 20px; padding: 22px; }
+    .pipe-console .bar { display: flex; justify-content: space-between; font-size: 0.78rem; color: #9FB0CC; }
+    .pipe-console .bar b { color: #fff; }
+    .pipe-chart { margin-top: 14px; width: 100%; height: auto; display: block; }
+    .pipe-chart .grid line { stroke: rgba(255,255,255,0.06); }
+    .pipe-chart .axis text { fill: #7F90AE; font-size: 11px; }
+    .pipe-chart .raw { fill: none; stroke: #9FB0CC; stroke-width: 1.5; }
+    .pipe-chart .smooth { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+    .pipe-chart .th-on { stroke: var(--lv3); stroke-dasharray: 5 4; }
+    .pipe-chart .th-off { stroke: var(--lv2); stroke-dasharray: 2 4; }
+    .pipe-chart .th-label { font-size: 11px; }
+    .pipe-chart .alarm rect { fill: rgba(232, 89, 12, 0.22); }
+    .pipe-chart .alarm.false rect { fill: rgba(214, 40, 57, 0.18); }
+    .pipe-chart .alarm text { font-size: 11px; font-weight: 700; }
+    .pipe-chart .event text { fill: #9FB0CC; font-size: 11px; }
+    .pipe-chart .event line { stroke: rgba(255,255,255,0.18); }
+    .pipe-console .note { margin-top: 10px; font-size: 0.72rem; color: #7F90AE; }
+
+    @media (max-width: 960px) {
+      .pipe-demo { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .pipe-lanes { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .pipe-steps li { transition: none; }
+    }
+
     /* ----- 태블릿 / 모바일 ----- */
     @media (max-width: 960px) {
       .stack { grid-template-columns: repeat(2, 1fr); }
@@ -306,6 +386,7 @@
         <li><a href="#levels">위험 단계</a></li>
         <li><a href="#features">기능</a></li>
         <li><a href="#stack">기술</a></li>
+        <li><a href="#pipeline">파이프라인</a></li>
         <li><a href="#roi">사업성</a></li>
         <li><a href="#poc">PoC</a></li>
       </ul>
@@ -578,8 +659,130 @@
       </div>
     </section>
 
+    <!-- ===== 데이터 파이프라인: 전처리와 후처리 ===== -->
+    <section class="block" id="pipeline">
+      <div class="wrap">
+        <span class="eyebrow">Data pipeline</span>
+        <h2>카메라 영상이 경보가 되기까지,<br>데이터를 두 번 다듬습니다</h2>
+        <p class="lead">AI 모델 앞에서는 영상을 보기 좋게 정리하고(전처리), 모델 뒤에서는 순간적인 오검출을 걸러냅니다(후처리). 같은 모델이라도 이 두 단계가 있어야 현장 조명과 분진 속에서 안정적으로 판단하고, 불필요한 경보를 줄일 수 있습니다.</p>
+
+        <div class="pipe-filter" role="group" aria-label="기능별로 보기">
+          <button type="button" data-f="all" aria-pressed="true">전체 단계</button>
+          <button type="button" data-f="fall" aria-pressed="false">낙상 감지</button>
+          <button type="button" data-f="obs" aria-pressed="false">통로 위험물</button>
+          <button type="button" data-f="fire" aria-pressed="false">화재·고온</button>
+        </div>
+
+        <div class="pipe-lanes">
+          <div class="pipe-lane pre">
+            <h3>전처리</h3>
+            <p>모델이 보기 전에, 영상을 일정한 품질로 맞춥니다.</p>
+            <ol class="pipe-steps">
+              <li data-uses="fall obs fire">
+                <h4>스트림 수신과 프레임 샘플링</h4>
+                <p>RTSP 영상을 받아 필요한 만큼만 프레임을 뽑아 Edge 장치의 연산량을 줄입니다.</p>
+                <div class="param">예시 설정 <b>30fps → 10fps</b></div>
+                <div class="pipe-uses"><span class="u-fall">낙상</span><span class="u-obs">위험물</span><span class="u-fire">화재</span></div>
+              </li>
+              <li data-uses="fall obs fire">
+                <h4>렌즈 왜곡 보정과 RGB·열화상 정합</h4>
+                <p>광각 렌즈의 휘어짐을 펴고, 열화상 온도 지도를 RGB 화면 위에 같은 좌표로 겹칩니다.</p>
+                <div class="param">예시 설정 <b>체커보드 캘리브레이션 + 호모그래피</b></div>
+                <div class="pipe-uses"><span class="u-fall">낙상</span><span class="u-obs">위험물</span><span class="u-fire">화재</span></div>
+              </li>
+              <li data-uses="fall obs">
+                <h4>저조도·역광 보정</h4>
+                <p>창고 구석의 어두운 영역과 출입구 역광을 국소적으로 보정해 작업자 윤곽을 살립니다.</p>
+                <div class="param">예시 설정 <b>CLAHE, clipLimit 2.0, 8×8</b></div>
+                <div class="pipe-uses"><span class="u-fall">낙상</span><span class="u-obs">위험물</span></div>
+              </li>
+              <li data-uses="fire">
+                <h4>열화상 온도 변환과 노이즈 제거</h4>
+                <p>센서 원시값을 섭씨 온도로 바꾸고, 순간 튀는 픽셀값을 시간 중앙값 필터로 걸러냅니다.</p>
+                <div class="param">예시 설정 <b>5프레임 중앙값 필터</b></div>
+                <div class="pipe-uses"><span class="u-fire">화재</span></div>
+              </li>
+              <li data-uses="obs fire">
+                <h4>관심 구역(ROI) 마스킹</h4>
+                <p>관리자가 지정한 통로와 설비 구역만 남기고, 컨베이어처럼 늘 움직이는 영역은 분석에서 뺍니다.</p>
+                <div class="param">예시 설정 <b>카메라별 다각형 마스크</b></div>
+                <div class="pipe-uses"><span class="u-obs">위험물</span><span class="u-fire">화재</span></div>
+              </li>
+              <li data-uses="fall obs fire">
+                <h4>크기 맞춤과 정규화</h4>
+                <p>비율을 유지한 채 모델 입력 크기로 맞추고, TensorRT 엔진이 받는 형식으로 변환합니다.</p>
+                <div class="param">예시 설정 <b>640×640 letterbox, FP16</b></div>
+                <div class="pipe-uses"><span class="u-fall">낙상</span><span class="u-obs">위험물</span><span class="u-fire">화재</span></div>
+              </li>
+            </ol>
+          </div>
+
+          <div class="pipe-lane post">
+            <h3>후처리</h3>
+            <p>모델이 본 결과를, 믿을 수 있는 판단으로 바꿉니다.</p>
+            <ol class="pipe-steps">
+              <li data-uses="fall obs fire">
+                <h4>신뢰도 기준과 중복 제거</h4>
+                <p>확신이 낮은 검출을 버리고, 같은 물체에 겹친 박스를 하나로 합칩니다.</p>
+                <div class="param">예시 설정 <b>confidence 0.4, NMS IoU 0.5</b></div>
+                <div class="pipe-uses"><span class="u-fall">낙상</span><span class="u-obs">위험물</span><span class="u-fire">화재</span></div>
+              </li>
+              <li data-uses="fall obs">
+                <h4>객체 추적과 ID 유지</h4>
+                <p>프레임마다 같은 작업자와 같은 박스에 같은 번호를 붙여, 시간 흐름을 따라갈 수 있게 합니다.</p>
+                <div class="param">예시 설정 <b>ByteTrack, 30프레임 유지</b></div>
+                <div class="pipe-uses"><span class="u-fall">낙상</span><span class="u-obs">위험물</span></div>
+              </li>
+              <li data-uses="fall">
+                <h4>관절 좌표 평활화와 자세 특징 계산</h4>
+                <p>떨리는 관절 좌표를 부드럽게 다듬은 뒤, 몸통 기울기와 머리가 내려오는 속도를 계산합니다.</p>
+                <div class="param">예시 설정 <b>One Euro 필터, 몸통 각도 &gt; 60°</b></div>
+                <div class="pipe-uses"><span class="u-fall">낙상</span></div>
+              </li>
+              <li data-uses="fall obs fire">
+                <h4>시간 창 판정</h4>
+                <p>한 장면이 아니라 일정 시간 동안의 결과를 모아 판단합니다. 방치 시간과 온도 상승 속도도 여기서 계산합니다.</p>
+                <div class="param">예시 설정 <b>최근 15프레임 중 10프레임 이상</b></div>
+                <div class="pipe-uses"><span class="u-fall">낙상</span><span class="u-obs">위험물</span><span class="u-fire">화재</span></div>
+              </li>
+              <li data-uses="fire">
+                <h4>RGB·열화상 복합 판단</h4>
+                <p>화염·연기 검출과 고온이 같은 위치에서 함께 나타날 때만 긴급 단계로 올립니다.</p>
+                <div class="param">예시 설정 <b>화염 AND (온도 &gt; 80℃ 또는 +5℃/분)</b></div>
+                <div class="pipe-uses"><span class="u-fire">화재</span></div>
+              </li>
+              <li data-uses="fall obs fire">
+                <h4>경보 안정화</h4>
+                <p>경보를 켜는 기준과 끄는 기준을 다르게 두어 깜빡임을 막고, 같은 사건의 알림이 반복되지 않게 합니다.</p>
+                <div class="param">예시 설정 <b>켜짐 0.6 / 꺼짐 0.4, 재알림 60초</b></div>
+                <div class="pipe-uses"><span class="u-fall">낙상</span><span class="u-obs">위험물</span><span class="u-fire">화재</span></div>
+              </li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="pipe-demo">
+          <div class="copy">
+            <h3>후처리를 켜면, 앉는 동작은 무시하고 실제 낙상만 남습니다</h3>
+            <p>아래는 작업자 한 명의 20초 동안 낙상 점수입니다. 원본 점수는 몸을 숙이거나 앉을 때도 잠깐 기준선을 넘습니다. 후처리를 거치면 짧은 튐은 사라지고, 쓰러진 뒤 이어지는 신호만 경보로 이어집니다.</p>
+            <div class="pipe-toggle" role="group" aria-label="점수 보기 방식">
+              <button type="button" data-m="raw" aria-pressed="true">원본 점수</button>
+              <button type="button" data-m="post" aria-pressed="false">후처리 적용</button>
+            </div>
+            <p class="pipe-result" aria-live="polite"></p>
+          </div>
+
+          <div class="pipe-console">
+            <div class="bar"><span><b>CAM-03</b> 작업자 ID 7 낙상 점수</span><span>20초</span></div>
+            <svg class="pipe-chart" viewBox="0 0 600 240" role="img" aria-label="시간에 따른 낙상 점수 그래프"></svg>
+            <div class="note">※ 후처리 효과를 설명하기 위한 예시 데이터이며 실제 운영 데이터가 아닙니다.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ===== 개발 범위 ===== -->
-    <section class="block" id="scope">
+    <section class="block alt" id="scope">
       <div class="wrap">
         <span class="eyebrow">Scope</span>
         <h2>할 일과 하지 않을 일을 분명히 합니다</h2>
@@ -615,7 +818,7 @@
     </section>
 
     <!-- ===== 사업성 ===== -->
-    <section class="block alt" id="roi">
+    <section class="block" id="roi">
       <div class="wrap">
         <span class="eyebrow">Business value</span>
         <h2>약 8개월이면 투자비를 회수할 것으로 예상합니다</h2>
@@ -648,7 +851,7 @@
     </section>
 
     <!-- ===== PoC ===== -->
-    <section class="block" id="poc">
+    <section class="block alt" id="poc">
       <div class="wrap">
         <span class="eyebrow">Proof of concept</span>
         <h2>세 가지 핵심 기능부터 검증합니다</h2>
@@ -685,6 +888,142 @@
       <span>나만의 피지컬 AI 제품 기획 과제</span>
     </div>
   </footer>
+
+<script>
+(function () {
+  /* 기능별 보기 */
+  var filterBtns = document.querySelectorAll('.pipe-filter button');
+  var steps = document.querySelectorAll('.pipe-steps li');
+  filterBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var f = btn.dataset.f;
+      filterBtns.forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+      steps.forEach(function (li) {
+        var on = f === 'all' || li.dataset.uses.split(' ').indexOf(f) !== -1;
+        li.classList.toggle('dim', !on);
+      });
+    });
+  });
+
+  /* 후처리 효과 그래프 */
+  var svg = document.querySelector('.pipe-chart');
+  if (!svg) return;
+  var NS = 'http://www.w3.org/2000/svg';
+  var W = 600, H = 240, L = 34, R = 10, T = 26, B = 28;
+  var N = 200, FPS = 10;            // 20초, 10fps
+  var ON = 0.6, OFF = 0.4;          // 히스테리시스 기준
+
+  // 예시 데이터: 숙이기(3초), 앉기(7.5초)는 짧은 튐, 낙상(12초)은 지속 신호
+  var seed = 7;
+  function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  function bump(t, c, w, h) { return h * Math.exp(-Math.pow((t - c) / w, 2)); }
+  var raw = [];
+  for (var i = 0; i < N; i++) {
+    var t = i / FPS;
+    var v = 0.12 + (rnd() - 0.5) * 0.14
+          + bump(t, 3.0, 0.25, 0.62) + bump(t, 7.5, 0.35, 0.55)
+          + (t > 12 ? 0.7 * (1 - Math.exp(-(t - 12) * 3)) : 0)
+          + (rnd() < 0.03 ? 0.35 : 0);
+    raw.push(Math.max(0, Math.min(1, v)));
+  }
+  // 후처리: 지수이동평균 → 히스테리시스 → 최근 15프레임 중 10프레임 이상 조건
+  var smooth = [], a = 0.25, s = raw[0];
+  raw.forEach(function (v) { s = a * v + (1 - a) * s; smooth.push(s); });
+
+  function alarmsRaw() {
+    var out = [], start = -1;
+    raw.forEach(function (v, i) {
+      if (v >= ON && start < 0) start = i;
+      if ((v < ON || i === N - 1) && start >= 0) { out.push([start, i]); start = -1; }
+    });
+    return out;
+  }
+  function alarmsPost() {
+    var out = [], on = false, start = -1, hist = [];
+    smooth.forEach(function (v, i) {
+      hist.push(v >= ON ? 1 : 0); if (hist.length > 15) hist.shift();
+      var votes = hist.reduce(function (x, y) { return x + y; }, 0);
+      if (!on && votes >= 10) { on = true; start = i; }
+      if (on && (v < OFF || i === N - 1)) { on = false; out.push([start, i]); }
+    });
+    return out;
+  }
+
+  var x = function (i) { return L + (i / (N - 1)) * (W - L - R); };
+  var y = function (v) { return T + (1 - v) * (H - T - B); };
+  function el(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    (parent || svg).appendChild(e); return e;
+  }
+  function path(arr) {
+    return arr.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' ');
+  }
+  var isFalse = function (r) { return r[0] / FPS < 11; };   // 12초 이전 경보 = 오탐
+
+  var result = document.querySelector('.pipe-result');
+  function draw(mode) {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var g = el('g', { 'class': 'grid' });
+    [0, 0.25, 0.5, 0.75, 1].forEach(function (v) { el('line', { x1: L, x2: W - R, y1: y(v), y2: y(v) }, g); });
+    var ax = el('g', { 'class': 'axis' });
+    [0, 5, 10, 15, 20].forEach(function (s) {
+      var tx = el('text', { x: x(Math.min(s * FPS, N - 1)), y: H - 8, 'text-anchor': 'middle' }, ax);
+      tx.textContent = s + '초';
+    });
+    [0, 0.5, 1].forEach(function (v) {
+      var tx = el('text', { x: L - 6, y: y(v) + 4, 'text-anchor': 'end' }, ax); tx.textContent = v;
+    });
+
+    var alarms = mode === 'raw' ? alarmsRaw() : alarmsPost();
+    var lastEnd = -99;
+    alarms.forEach(function (r) {
+      var f = isFalse(r);
+      var ag = el('g', { 'class': 'alarm' + (f ? ' false' : '') });
+      el('rect', { x: x(r[0]), y: T, width: Math.max(3, x(r[1]) - x(r[0])), height: H - T - B }, ag);
+      if (r[0] - lastEnd > 10) {   // 붙어 있는 경보는 라벨 한 번만
+        var tx = el('text', { x: x(r[0]) + 4, y: T + 14, fill: f ? 'var(--lv4)' : 'var(--lv3)' }, ag);
+        tx.textContent = f ? '오탐' : '경보';
+      }
+      lastEnd = r[1];
+    });
+
+    var ev = el('g', { 'class': 'event' });
+    [[3.0, '숙이기'], [7.5, '앉기'], [12, '낙상']].forEach(function (e) {
+      var xi = x(e[0] * FPS);
+      el('line', { x1: xi, x2: xi, y1: T - 4, y2: T }, ev);
+      var tx = el('text', { x: xi, y: T - 8, 'text-anchor': 'middle' }, ev); tx.textContent = e[1];
+    });
+
+    el('line', { 'class': 'th-on', x1: L, x2: W - R, y1: y(ON), y2: y(ON) });
+    var lb = el('text', { 'class': 'th-label', x: W - R, y: y(ON) - 5, 'text-anchor': 'end', fill: 'var(--lv3)' });
+    lb.textContent = '경보 기준 ' + ON;
+    if (mode === 'post') {
+      el('line', { 'class': 'th-off', x1: L, x2: W - R, y1: y(OFF), y2: y(OFF) });
+      var lb2 = el('text', { 'class': 'th-label', x: W - R, y: y(OFF) + 14, 'text-anchor': 'end', fill: 'var(--lv2)' });
+      lb2.textContent = '해제 기준 ' + OFF;
+    }
+
+    el('path', { 'class': 'raw', d: path(raw), opacity: mode === 'raw' ? 1 : 0.3 });
+    if (mode === 'post') el('path', { 'class': 'smooth', d: path(smooth) });
+
+    var falses = alarms.filter(isFalse).length;
+    result.innerHTML = '경보 ' + alarms.length + '회, 이 중 오탐 ' + falses + '회' +
+      '<small>' + (mode === 'raw'
+        ? '프레임마다 따로 판단해 짧은 튐도 경보가 되고, 실제 낙상 경보도 끊겼다 켜지기를 반복합니다.'
+        : '점수 평활화, 시간 창 투표, 켜짐·꺼짐 기준 분리를 거친 결과입니다.') + '</small>';
+  }
+
+  var modeBtns = document.querySelectorAll('.pipe-toggle button');
+  modeBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      modeBtns.forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+      draw(btn.dataset.m);
+    });
+  });
+  draw('raw');
+})();
+</script>
 
 </body>
 </html>
