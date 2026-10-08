@@ -349,10 +349,28 @@
       .pipe-steps li { transition: none; }
     }
 
+    /* ----- 모델·학습·검증 ----- */
+    .table-wrap { margin-top: 28px; overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+    .mtable { width: 100%; border-collapse: collapse; font-size: 0.93rem; min-width: 720px; }
+    .mtable th, .mtable td { padding: 14px 18px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    .mtable tr:last-child td { border-bottom: 0; }
+    .mtable thead th { font-size: 0.78rem; letter-spacing: 0.06em; color: var(--accent-dark); background: var(--accent-soft); }
+    .mtable td:first-child { font-weight: 700; white-space: nowrap; }
+    .mtable td.pick { font-weight: 700; color: var(--ink); }
+    .mtable td.why, .mtable td.how { color: var(--muted); }
+    .mtable .pending { display: inline-block; font-size: 0.75rem; font-weight: 700; padding: 1px 10px; border-radius: 999px; background: var(--bg); border: 1px dashed var(--line); color: var(--muted); white-space: nowrap; }
+    .train { margin-top: 28px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; counter-reset: tstep; }
+    .train li { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; counter-increment: tstep; }
+    .train li::before { content: counter(tstep, decimal-leading-zero); font-size: 0.78rem; font-weight: 800; color: var(--accent-dark); letter-spacing: 0.1em; }
+    .train h4 { margin: 4px 0 6px; font-size: 1rem; }
+    .train p { color: var(--muted); font-size: 0.92rem; }
+    .model-note { margin-top: 16px; color: var(--muted); font-size: 0.88rem; }
+
     /* ----- 태블릿 / 모바일 ----- */
     @media (max-width: 960px) {
       .stack { grid-template-columns: repeat(2, 1fr); }
       .roi { grid-template-columns: repeat(2, 1fr); }
+      .train { grid-template-columns: repeat(2, 1fr); }
       .stats ul { grid-template-columns: repeat(2, 1fr); }
       .stats li:nth-child(2) { border-right: 0; }
       .stats li:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
@@ -362,7 +380,7 @@
       .hero { grid-template-columns: 1fr; padding-top: 56px; padding-bottom: 48px; gap: 36px; }
       .stats .num { font-size: 1.7rem; }
       .stats li { padding: 24px 16px; }
-      .cards.c3, .cards.c2, .compare, .scope, .poc, .checks { grid-template-columns: 1fr; }
+      .cards.c3, .cards.c2, .compare, .scope, .poc, .checks, .train { grid-template-columns: 1fr; }
       .flow { grid-template-columns: 1fr; gap: 32px; }
       .flow li::after { display: none; }
       .features li { grid-template-columns: 1fr; gap: 4px; }
@@ -389,6 +407,7 @@
         <li><a href="#pipeline">파이프라인</a></li>
         <li><a href="#roi">사업성</a></li>
         <li><a href="#poc">PoC</a></li>
+        <li><a href="#model">모델·검증</a></li>
       </ul>
     </nav>
   </header>
@@ -877,6 +896,62 @@
             <div class="kpi">목표: Recall ≥ 90%, 판단시간 ≤ 3초</div>
           </li>
         </ol>
+      </div>
+    </section>
+
+    <!-- ===== 모델 선정 · 학습 · 검증 ===== -->
+    <section class="block" id="model">
+      <div class="wrap">
+        <span class="eyebrow">Model · Training · Validation</span>
+        <h2>하나의 큰 모델 대신,<br>Edge에서 도는 가벼운 모델들을 조합합니다</h2>
+        <p class="lead">낙상, 통로 위험물, 화재·고온은 성격이 다른 위험입니다. 그래서 YOLO 계열 경량 검출기, 자세 추정, 추적, 열화상 규칙을 결합하고, 모두 Jetson Orin Nano급 장치 한 대에서 2초 안에 판단하도록 구성합니다.</p>
+
+        <h3 class="subhead">모델 선정</h3>
+        <div class="table-wrap">
+          <table class="mtable">
+            <thead>
+              <tr><th>기능</th><th>검토한 후보</th><th>최종 선정</th><th>선정 이유</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>작업자·위험물 검출</td><td>YOLO(n/s), Faster R-CNN, DETR 계열</td><td class="pick">YOLO 계열 nano/small</td><td class="why">Edge 실시간 추론에 적합하고 TensorRT 변환을 지원합니다. 2-stage·Transformer 계열은 지연이 큽니다.</td></tr>
+              <tr><td>낙상 판단</td><td>영상 행동인식(3D CNN), 포즈 + 시계열</td><td class="pick">MediaPipe Pose + 시계열 분류기</td><td class="why">관절 좌표는 배경·조명 변화에 강하고, 낙상 데이터가 적어도 학습할 수 있습니다.</td></tr>
+              <tr><td>작업자 추적</td><td>DeepSORT, ByteTrack</td><td class="pick">ByteTrack</td><td class="why">외형 임베딩 모델이 없어 가볍고, 무반응·방치 시간 측정에 필요한 ID를 유지합니다.</td></tr>
+              <tr><td>화염·연기</td><td>분류 CNN, 검출 모델</td><td class="pick">YOLO 미세조정 (fire, smoke)</td><td class="why">위치까지 알려줘 관리자 알림에 쓸 수 있고, 검출기와 추론 엔진을 공유합니다.</td></tr>
+              <tr><td>이상 고온</td><td>딥러닝 분류, 임계값 규칙</td><td class="pick">절대온도 + 상승률 규칙</td><td class="why">온도값 자체가 신호라 학습 없이도 설명 가능한 판단을 합니다.</td></tr>
+              <tr><td>위험도 판단</td><td>학습형 분류기, 규칙 엔진</td><td class="pick">규칙 기반 Risk Engine</td><td class="why">Level 0~4 기준이 정해져 있고, 안전 경보는 근거를 설명할 수 있어야 합니다.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="subhead">학습 방법</h3>
+        <p class="lead">공개 데이터셋(COCO, 낙상·화재 공개 데이터)으로 사전학습된 모델을, 직접 연출 촬영한 영상으로 미세조정합니다. 같은 영상의 프레임이 학습·테스트에 섞이지 않도록 영상 단위로 70 / 15 / 15로 나눕니다.</p>
+        <ol class="train">
+          <li><h4>검출기 미세조정</h4><p>COCO 사전학습 YOLO를 person, box, tool, material, fire, smoke로 미세조정합니다. 640×640, 100 epoch, 조기 종료.</p></li>
+          <li><h4>낙상 분류기 학습</h4><p>1~2초 동안의 골반 높이 변화 속도와 몸통 기울기로 먼저 규칙 기준선을 잡고, 데이터가 쌓이면 LSTM/1D-CNN으로 바꿉니다.</p></li>
+          <li><h4>불균형 대응</h4><p>낙상·화재는 드문 사건이라 오버샘플링, 클래스 가중치, Focal Loss를 적용합니다.</p></li>
+          <li><h4>임계값 조정</h4><p>놓치면 안 되는 위험이므로 검증 세트에서 Recall을 먼저 맞추고, 그 안에서 오탐을 최소화합니다.</p></li>
+          <li><h4>Edge 변환</h4><p>PyTorch → ONNX → TensorRT FP16으로 변환하고, 정확도 저하가 1%p 이내인지 확인합니다.</p></li>
+          <li><h4>지속 개선</h4><p>관리자가 "오탐"으로 분류한 이벤트를 모아 하드 네거티브로 재학습합니다.</p></li>
+        </ol>
+
+        <h3 class="subhead">검증 방법</h3>
+        <p class="lead">테스트 세트 성능, 학습에 쓰지 않은 새 연출 영상으로 하는 시나리오 시험, Edge 장치에서 재는 지연시간의 세 단계로 검증합니다. 정확도 대신 Recall(미탐)과 오탐률을 따로 봅니다.</p>
+        <div class="table-wrap">
+          <table class="mtable">
+            <thead>
+              <tr><th>항목</th><th>지표</th><th>측정 방법</th><th>목표</th><th>결과</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>작업자 검출</td><td>mAP@0.5, Recall</td><td class="how">테스트 세트</td><td>≥ 97%</td><td><span class="pending">측정 예정</span></td></tr>
+              <tr><td>낙상 감지</td><td>Recall, 오탐률</td><td class="how">연출 낙상 vs 앉기·눕기 등 정상 행동</td><td>Recall ≥ 90%, 오탐 ≤ 5%</td><td><span class="pending">측정 예정</span></td></tr>
+              <tr><td>통로 위험물</td><td>검출률, 방치시간 오차</td><td class="how">ROI에 박스를 두고 스톱워치와 비교</td><td>≥ 90%, ±1초</td><td><span class="pending">측정 예정</span></td></tr>
+              <tr><td>화재·고온</td><td>Recall, 오탐률</td><td class="how">공개 화재 영상 + 생성 온도 로그, 조명·반사광 포함</td><td>Recall ≥ 90%</td><td><span class="pending">측정 예정</span></td></tr>
+              <tr><td>판단 지연</td><td>이벤트 → 판단 (초)</td><td class="how">이벤트 프레임과 판단 로그의 시간 차</td><td>낙상 ≤ 2초, 화재 ≤ 3초</td><td><span class="pending">측정 예정</span></td></tr>
+              <tr><td>추론 속도</td><td>FPS (Edge)</td><td class="how">TensorRT FP16, 카메라 동시 입력</td><td>≥ 15 FPS (가정)</td><td><span class="pending">측정 예정</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="model-note">※ 현재는 PoC 수행 계획입니다. 실험을 마치면 결과 칸을 실측값으로 채웁니다.</p>
       </div>
     </section>
   </main>
