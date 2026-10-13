@@ -128,7 +128,7 @@
       const res = await fetch(ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, history }),
+        body: JSON.stringify({ question, history, asked: [...asked] }),
         signal: AbortSignal.timeout(60000),
       });
       const data = await res.json();

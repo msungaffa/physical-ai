@@ -118,7 +118,7 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ error: "POST only" }, 405);
 
   try {
-    const { question, history = [] } = await req.json();
+    const { question, history = [], asked: askedInput = [] } = await req.json();
     if (typeof question !== "string" || !question.trim()) return json({ error: "question is required" }, 400);
     if (question.length > 500) return json({ error: "질문은 500자 이내로 입력해 주세요." }, 400);
 
@@ -142,7 +142,12 @@ Deno.serve(async (req) => {
       .map((m, i) => `(${i + 1}) [${m.source} · ${m.title}]\n${m.content}`)
       .join("\n\n") || "(관련 자료 없음)";
 
-    const asked = [...recent.filter((t) => t.role === "user").map((t) => t.text), question.trim()];
+    // 위젯이 보낸 지금까지의 질문 전체 + 이번 질문은 연관 질문에서 뺀다
+    const asked = [
+      ...(Array.isArray(askedInput) ? askedInput : []).filter((q) => typeof q === "string").slice(-50),
+      ...recent.filter((t) => t.role === "user").map((t) => t.text),
+      question.trim(),
+    ];
     const [{ answer, model }, related] = await Promise.all([
       generate(question, context, recent),
       relatedQuestions(embedding, asked),
