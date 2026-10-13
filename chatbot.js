@@ -117,6 +117,7 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, history }),
+        signal: AbortSignal.timeout(60000),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
@@ -125,7 +126,9 @@
       history.push({ role: "user", text: question }, { role: "assistant", text: data.answer });
     } catch (e) {
       pending.className = "cb-msg bot error";
-      pending.textContent = "죄송해요, 답변을 가져오지 못했습니다. (" + e.message + ")";
+      pending.textContent = e.name === "TimeoutError"
+        ? "응답이 너무 오래 걸려 중단했어요. 잠시 후 다시 질문해 주세요."
+        : "죄송해요, 답변을 가져오지 못했습니다. (" + e.message + ")";
     } finally {
       send.disabled = false;
       input.focus();

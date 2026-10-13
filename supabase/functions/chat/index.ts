@@ -2,10 +2,12 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY")!;
-// 앞 모델이 무료 한도 초과(429)·과부하(503)·미지원(404)이면 다음 모델로 넘어간다
+// 앞 모델이 무료 한도 초과(429)·과부하(503)·미지원(404)·시간 초과면 다음 모델로 넘어간다
+// gemini-3.8-flash는 무료 한도가 하루 20회이고 과부하로 응답이 멈추는 일이 잦아 마지막에 둔다
 const CHAT_MODELS = (Deno.env.get("GEMINI_CHAT_MODELS") ??
-  "gemini-3.8-flash,gemini-3.5-flash-lite,gemini-3.5-flash").split(",").map((m) => m.trim());
+  "gemini-3.5-flash-lite,gemini-3.5-flash,gemini-3.8-flash").split(",").map((m) => m.trim());
 const RETRYABLE = new Set([404, 429, 500, 503]);
+const MODEL_TIMEOUT_MS = 15_000;
 const EMBED_MODEL = "gemini-embedding-001";
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 const MATCH_COUNT = 6;
@@ -47,6 +49,7 @@ async function embedQuery(text: string): Promise<number[]> {
       taskType: "RETRIEVAL_QUERY",
       outputDimensionality: 768,
     }),
+    signal: AbortSignal.timeout(10_000),
   });
   if (!res.ok) throw new Error(`embed ${res.status}: ${await res.text()}`);
   return (await res.json()).embedding.values;
@@ -67,11 +70,19 @@ async function generate(question: string, context: string, history: Turn[]) {
   });
   let lastError = "";
   for (const model of CHAT_MODELS) {
-    const res = await fetch(`${GEMINI_BASE}/${model}:generateContent`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY },
-      body,
-    });
+    let res: Response;
+    try {
+      res = await fetch(`${GEMINI_BASE}/${model}:generateContent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY },
+        body,
+        signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
+      });
+    } catch (e) {
+      lastError = `generate ${model} 시간 초과/연결 실패: ${e instanceof Error ? e.message : e}`;
+      console.warn(lastError);
+      continue;
+    }
     if (res.ok) {
       const data = await res.json();
       const answer = (data.candidates?.[0]?.content?.parts ?? [])
