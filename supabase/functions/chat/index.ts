@@ -139,7 +139,8 @@ Deno.serve(async (req) => {
     });
     if (logError) console.error(logError);
 
-    return json({ answer, sources });
+    // 출처는 site_chat_logs에만 기록하고 화면으로는 보내지 않는다
+    return json({ answer });
   } catch (e) {
     console.error(e);
     return json({ error: "답변 생성 중 오류가 발생했습니다." }, 500);
