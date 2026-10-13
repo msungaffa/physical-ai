@@ -106,7 +106,7 @@
       b.type = "button";
       b.className = "cb-chip";
       b.textContent = q;
-      b.addEventListener("click", () => ask(q));
+      b.addEventListener("click", () => ask(q, true));
       chips.appendChild(b);
     });
     log.appendChild(chips);
@@ -116,7 +116,7 @@
   addMsg("bot", "안녕하세요! AI 작업장 안전관리 시스템에 대해 궁금한 점을 물어보세요.");
   showChips(SUGGESTIONS, "이런 걸 물어볼 수 있어요");
 
-  async function ask(question) {
+  async function ask(question, standalone = false) {
     if (chips) chips.remove();
     asked.add(question);
     let related = [];
@@ -128,7 +128,7 @@
       const res = await fetch(ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, history, asked: [...asked] }),
+        body: JSON.stringify({ question, history, asked: [...asked], standalone }),
         signal: AbortSignal.timeout(60000),
       });
       const data = await res.json();

@@ -29,6 +29,7 @@ const SYSTEM_PROMPT = `너는 "AI 기반 작업장 안전관리 시스템" 소�
 - 아래 [참고 자료](홈페이지, PRD, 보고서에서 검색한 내용)만 근거로 한국어로 답한다.
 - 참고 자료에 없는 내용은 지어내지 말고 "홈페이지 자료에서는 확인되지 않습니다"라고 말한다.
 - 수치(비용, 정확도, 기간 등)는 참고 자료에 적힌 값을 그대로 쓴다.
+- "비전QC" 보고서는 공장 불량품 검사라는 별도 사례 검토다. 비전QC를 물을 때만 그 내용으로 답하고, 안전관리 시스템 질문에는 그 수치를 섞지 않는다.
 - 3~6문장 정도로 간결하게, 필요하면 짧은 목록을 쓴다. 마크다운 굵게(**) 표시는 쓰지 않는다.`;
 
 type Turn = { role: "user" | "assistant"; text: string };
@@ -118,7 +119,8 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ error: "POST only" }, 405);
 
   try {
-    const { question, history = [], asked: askedInput = [] } = await req.json();
+    // standalone: 버튼으로 고른 질문처럼 그 자체로 완결된 질문이면 true
+    const { question, history = [], asked: askedInput = [], standalone = false } = await req.json();
     if (typeof question !== "string" || !question.trim()) return json({ error: "question is required" }, 400);
     if (question.length > 500) return json({ error: "질문은 500자 이내로 입력해 주세요." }, 400);
 
@@ -127,8 +129,9 @@ Deno.serve(async (req) => {
       .slice(-6)
       .map((t) => ({ role: t.role, text: t.text.slice(0, 1000) }));
 
-    // "그건 얼마야?" 같은 후속 질문도 찾을 수 있도록 직전 질문을 함께 임베딩
-    const lastUser = recent.findLast((t) => t.role === "user")?.text;
+    // 직접 입력한 "그건 얼마야?" 같은 후속 질문도 찾을 수 있도록 직전 질문을 함께 임베딩
+    // (버튼 질문은 앞 주제가 섞이면 엉뚱한 문서를 찾으므로 질문만 쓴다)
+    const lastUser = standalone === true ? undefined : recent.findLast((t) => t.role === "user")?.text;
     const embedding = await embedQuery(lastUser ? `${lastUser}\n${question}` : question);
     const { data, error } = await supabase.rpc("match_site_chunks", {
       query_embedding: JSON.stringify(embedding),
