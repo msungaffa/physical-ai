@@ -12,6 +12,7 @@ const EMBED_MODEL = "gemini-embedding-001";
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 const MATCH_COUNT = 6;
 const MATCH_THRESHOLD = 0.5;
+const RELATED_COUNT = 3;
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -98,6 +99,20 @@ async function generate(question: string, context: string, history: Turn[]) {
   throw new Error(lastError);
 }
 
+// 방금 대화와 의미가 가까운 연관 질문 (이미 물어본 질문은 제외). 실패해도 답변은 그대로 보낸다
+async function relatedQuestions(embedding: number[], asked: string[]): Promise<string[]> {
+  const { data, error } = await supabase.rpc("match_site_questions", {
+    query_embedding: JSON.stringify(embedding),
+    exclude: asked,
+    match_count: RELATED_COUNT,
+  });
+  if (error) {
+    console.error(error);
+    return [];
+  }
+  return (data ?? []).map((r: { question: string }) => r.question);
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "POST only" }, 405);
@@ -127,7 +142,11 @@ Deno.serve(async (req) => {
       .map((m, i) => `(${i + 1}) [${m.source} · ${m.title}]\n${m.content}`)
       .join("\n\n") || "(관련 자료 없음)";
 
-    const { answer, model } = await generate(question, context, recent);
+    const asked = [...recent.filter((t) => t.role === "user").map((t) => t.text), question.trim()];
+    const [{ answer, model }, related] = await Promise.all([
+      generate(question, context, recent),
+      relatedQuestions(embedding, asked),
+    ]);
     const sources = [...new Set(matches.map((m) => `${m.source} · ${m.title}`))];
 
     const { error: logError } = await supabase.from("site_chat_logs").insert({
@@ -140,7 +159,7 @@ Deno.serve(async (req) => {
     if (logError) console.error(logError);
 
     // 출처는 site_chat_logs에만 기록하고 화면으로는 보내지 않는다
-    return json({ answer });
+    return json({ answer, related });
   } catch (e) {
     console.error(e);
     return json({ error: "답변 생성 중 오류가 발생했습니다." }, 500);

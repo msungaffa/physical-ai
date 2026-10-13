@@ -1,5 +1,6 @@
 // 문서 적재: GitHub 저장소의 홈페이지·PRD·보고서를 읽어 청크 → 임베딩 → site_chunks 저장
-// 문서를 고쳐 push한 뒤 POST로 호출하면 바뀐 청크만 다시 임베딩하고, 사라진 청크는 지운다.
+// 연관 질문(data/chatbot-questions.json)도 임베딩해 site_questions에 저장한다.
+// 문서를 고쳐 push한 뒤 POST로 호출하면 바뀐 것만 다시 임베딩하고, 사라진 것은 지운다.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { type Chunk, chunkHtml, chunkMarkdown } from "./chunk.ts";
 
@@ -47,7 +48,10 @@ async function sha256(text: string) {
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-async function embedBatch(texts: string[]): Promise<number[][]> {
+async function embedBatch(
+  texts: string[],
+  taskType: "RETRIEVAL_DOCUMENT" | "RETRIEVAL_QUERY" = "RETRIEVAL_DOCUMENT",
+): Promise<number[][]> {
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${EMBED_MODEL}:batchEmbedContents`,
     {
@@ -57,7 +61,7 @@ async function embedBatch(texts: string[]): Promise<number[][]> {
         requests: texts.map((text) => ({
           model: `models/${EMBED_MODEL}`,
           content: { parts: [{ text }] },
-          taskType: "RETRIEVAL_DOCUMENT",
+          taskType,
           outputDimensionality: 768,
         })),
       }),
@@ -94,11 +98,32 @@ Deno.serve(async (req) => {
       if (error) throw error;
     }
 
+    // 연관 질문: 사용자 질문과 비교하므로 질문용(RETRIEVAL_QUERY)으로 임베딩, 질문 문장 자체가 키
+    const questions: string[] = [...new Set<string>(
+      JSON.parse(await fetchText("data/chatbot-questions.json")).questions,
+    )];
+    const { data: qRows, error: qError } = await supabase.from("site_questions").select("question");
+    if (qError) throw qError;
+    const existingQuestions = new Set(qRows.map((r) => r.question));
+    const pendingQuestions = questions.filter((q) => !existingQuestions.has(q));
+    const addedQuestions = pendingQuestions.slice(0, MAX_EMBED_PER_RUN - added.length);
+    const staleQuestions = [...existingQuestions].filter((q) => !questions.includes(q));
+
+    if (addedQuestions.length) {
+      const vectors = await embedBatch(addedQuestions, "RETRIEVAL_QUERY");
+      const rows = addedQuestions.map((question, i) => ({ question, embedding: JSON.stringify(vectors[i]) }));
+      const { error } = await supabase.from("site_questions").insert(rows);
+      if (error) throw error;
+    }
+    if (staleQuestions.length) {
+      const { error } = await supabase.from("site_questions").delete().in("question", staleQuestions);
+      if (error) throw error;
+    }
+
     return json({
-      total: byHash.size,
-      added: added.length,
-      removed: stale.length,
-      remaining: pending.length - added.length,
+      chunks: { total: byHash.size, added: added.length, removed: stale.length },
+      questions: { total: questions.length, added: addedQuestions.length, removed: staleQuestions.length },
+      remaining: pending.length - added.length + pendingQuestions.length - addedQuestions.length,
     });
   } catch (e) {
     console.error(e);
