@@ -35,7 +35,6 @@
     .cb-msg.user { align-self: flex-end; background: var(--accent, #0284C7); color: #fff; border-bottom-right-radius: 4px; }
     .cb-msg.bot { align-self: flex-start; background: var(--surface, #fff); border: 1px solid var(--line, #DCE3EE); border-bottom-left-radius: 4px; }
     .cb-msg.bot.error { border-color: var(--lv4, #D62839); color: var(--lv4, #D62839); }
-    .cb-sources { margin-top: 6px; font-size: 0.75rem; color: var(--muted, #55606E); }
     .cb-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .cb-chip {
       border: 1px solid var(--accent, #0284C7); color: var(--accent-dark, #006194); background: var(--accent-soft, #E3F2FB);
@@ -79,35 +78,39 @@
   const input = panel.querySelector(".cb-input");
   const send = panel.querySelector(".cb-send");
 
-  function addMsg(role, text, sources) {
+  // 출처는 화면에 표시하지 않고 서버(site_chat_logs)에만 기록한다
+  function addMsg(role, text) {
     const el = document.createElement("div");
     el.className = `cb-msg ${role}`;
     el.textContent = text;
-    if (sources && sources.length) {
-      const s = document.createElement("div");
-      s.className = "cb-sources";
-      s.textContent = "출처: " + sources.slice(0, 3).join(", ");
-      el.appendChild(s);
-    }
     log.appendChild(el);
     log.scrollTop = log.scrollHeight;
     return el;
   }
 
+  // 추천 질문 버튼: 답변이 끝날 때마다 대화 맨 아래에 다시 보여준다
+  const SUGGESTIONS = ["어떤 위험을 감지하나요?", "어떤 AI 모델을 쓰나요?", "투자비 회수 기간은?"];
+  let chips = null;
+  function showChips() {
+    chips = document.createElement("div");
+    chips.className = "cb-chips";
+    SUGGESTIONS.forEach((q) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "cb-chip";
+      b.textContent = q;
+      b.addEventListener("click", () => ask(q));
+      chips.appendChild(b);
+    });
+    log.appendChild(chips);
+    log.scrollTop = log.scrollHeight;
+  }
+
   addMsg("bot", "안녕하세요! AI 작업장 안전관리 시스템에 대해 궁금한 점을 물어보세요.");
-  const chips = document.createElement("div");
-  chips.className = "cb-chips";
-  ["어떤 위험을 감지하나요?", "어떤 AI 모델을 쓰나요?", "투자비 회수 기간은?"].forEach((q) => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "cb-chip";
-    b.textContent = q;
-    b.addEventListener("click", () => { chips.remove(); ask(q); });
-    chips.appendChild(b);
-  });
-  log.appendChild(chips);
+  showChips();
 
   async function ask(question) {
+    if (chips) chips.remove();
     addMsg("user", question);
     const pending = addMsg("bot", "답변을 찾는 중…");
     send.disabled = true;
@@ -122,7 +125,7 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       pending.remove();
-      addMsg("bot", data.answer, data.sources);
+      addMsg("bot", data.answer);
       history.push({ role: "user", text: question }, { role: "assistant", text: data.answer });
     } catch (e) {
       pending.className = "cb-msg bot error";
@@ -131,6 +134,7 @@
         : "죄송해요, 답변을 가져오지 못했습니다. (" + e.message + ")";
     } finally {
       send.disabled = false;
+      showChips();
       input.focus();
     }
   }
@@ -149,7 +153,6 @@
     const q = input.value.trim();
     if (!q || send.disabled) return;
     input.value = "";
-    chips.remove();
     ask(q);
   });
 })();
