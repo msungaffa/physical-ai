@@ -375,6 +375,95 @@
     .train p { color: var(--muted); font-size: 0.92rem; }
     .model-note { margin-top: 16px; color: var(--muted); font-size: 0.88rem; }
 
+    /* ----- 하드웨어 구성 (어두운 구역) ----- */
+    section.block.hw { background: var(--dark); color: #E6ECF7; border-top-color: var(--dark); }
+    .hw .eyebrow { color: #6CC4F0; }
+    section.block.hw .lead { color: #9FB0CC; }
+    .hw .subhead { color: #fff; }
+    .hw-chain {
+      margin-top: 44px; display: grid; align-items: stretch;
+      grid-template-columns: 1fr 88px 1fr 88px 1fr 88px 1fr;
+    }
+    .hw-stage {
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 18px;
+      background: rgba(255,255,255,0.04); display: grid; gap: 10px; align-content: start;
+    }
+    .hw-stage > h3 { font-size: 0.78rem; letter-spacing: 0.12em; color: #6CC4F0; }
+    .hw-node { border-radius: 10px; padding: 12px 14px; background: rgba(255,255,255,0.06); }
+    .hw-node b { display: block; color: #fff; font-size: 0.97rem; }
+    .hw-node span { display: block; font-size: 0.8rem; color: #9FB0CC; }
+    .hw-node .spec { margin-top: 6px; font-size: 0.78rem; color: #E6ECF7; }
+    .hw-node.opt { border: 1px dashed rgba(255,255,255,0.2); background: transparent; }
+    .hw-stage.act .hw-node { background: rgba(232, 89, 12, 0.18); }
+    .hw-stage.act .hw-node b::before {
+      content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px;
+      background: var(--lv3); box-shadow: 0 0 0 4px rgba(232, 89, 12, 0.25); vertical-align: 1px;
+    }
+    .hw-link {
+      position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 0 6px; text-align: center; font-size: 0.72rem; line-height: 1.4; color: #9FB0CC;
+    }
+    .hw-arrow {
+      position: relative; width: 100%; height: 2px; margin: 8px 0;
+      background: linear-gradient(90deg, rgba(108,196,240,0.2), #6CC4F0);
+    }
+    .hw-arrow::after {
+      content: ""; position: absolute; right: -2px; top: 50%; transform: translateY(-50%);
+      border: 6px solid transparent; border-left-color: #6CC4F0; border-right: 0;
+    }
+    .hw-link b { color: #fff; font-weight: 700; }
+    .hw-server {
+      margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+      padding: 14px 18px; border-radius: 14px; border: 1px dashed rgba(255,255,255,0.2); font-size: 0.88rem; color: #9FB0CC;
+    }
+    .hw-server b { color: #fff; }
+    .hw-server .arrow { color: #6CC4F0; }
+    .hw-server .why-local { flex-basis: 100%; color: #E6ECF7; }
+
+    .hw-table { margin-top: 20px; overflow-x: auto; border-radius: 16px; border: 1px solid rgba(255,255,255,0.12); }
+    .hw-table table { width: 100%; min-width: 820px; border-collapse: collapse; font-size: 0.9rem; }
+    .hw-table th, .hw-table td { padding: 12px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .hw-table tr:last-child td { border-bottom: 0; }
+    .hw-table thead th { font-size: 0.75rem; letter-spacing: 0.06em; color: #6CC4F0; background: rgba(255,255,255,0.04); }
+    .hw-table td:first-child { color: #fff; font-weight: 700; white-space: nowrap; }
+    .hw-table td.m { color: #9FB0CC; }
+    .hw-table td.v { white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .hw-table .opt-tag { margin-left: 6px; font-size: 0.7rem; font-weight: 700; padding: 0 7px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.25); color: #9FB0CC; }
+
+    .hw-power { margin-top: 20px; display: grid; grid-template-columns: 1fr 260px; gap: 28px; align-items: center; }
+    .hw-bar { display: flex; height: 22px; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,0.06); }
+    .hw-bar i { display: block; height: 100%; }
+    .hw-bar i + i { border-left: 2px solid var(--dark); }
+    .hw-legend { margin-top: 14px; list-style: none; display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 0.85rem; color: #9FB0CC; }
+    .hw-legend li { display: flex; align-items: center; gap: 8px; }
+    .hw-legend li::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+    .hw-legend b { color: #fff; font-variant-numeric: tabular-nums; }
+    .hw-total .num { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; color: #fff; line-height: 1.1; }
+    .hw-total p { color: #9FB0CC; font-size: 0.88rem; }
+
+    .hw-notes { margin-top: 36px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; }
+    .hw-notes li { padding: 18px 20px; border-radius: 12px; background: rgba(108,196,240,0.1); color: #C9D6EA; font-size: 0.93rem; }
+    .hw-notes b { display: block; color: #fff; margin-bottom: 2px; }
+    .hw-source { margin-top: 18px; font-size: 0.82rem; color: #7F90AE; }
+
+    @media (max-width: 960px) {
+      .hw-chain { grid-template-columns: 1fr; }
+      .hw-link { padding: 4px 0 18px; }
+      .hw-arrow { width: 2px; height: 22px; margin: 6px 0; background: linear-gradient(180deg, rgba(108,196,240,0.2), #6CC4F0); }
+      .hw-arrow::after { right: auto; left: 50%; top: auto; bottom: -2px; transform: translateX(-50%); border: 6px solid transparent; border-top-color: #6CC4F0; border-bottom: 0; }
+      .hw-power { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 1080px) {
+      .nav ul { gap: 14px; }
+      .nav ul a { font-size: 0.85rem; }
+    }
+    @media (max-width: 900px) {
+      .nav ul { display: none; }
+    }
+    @media (max-width: 760px) {
+      .hw-notes { grid-template-columns: 1fr; }
+    }
+
     /* ----- 태블릿 / 모바일 ----- */
     @media (max-width: 960px) {
       .stack { grid-template-columns: repeat(2, 1fr); }
@@ -412,6 +501,7 @@
         <li><a href="#how">작동 방식</a></li>
         <li><a href="#ai">AI 모델</a></li>
         <li><a href="#features">기능</a></li>
+        <li><a href="#hardware">하드웨어</a></li>
         <li><a href="#pipeline">파이프라인</a></li>
         <li><a href="#roi">사업성</a></li>
         <li><a href="#poc">PoC</a></li>
@@ -676,8 +766,8 @@
           <div class="card">
             <h3>SENSING</h3>
             <ul>
-              <li>1080p IP 카메라</li>
-              <li>열화상 카메라 (FLIR 계열)</li>
+              <li>1080p IP 카메라 (PoE)</li>
+              <li>열화상 카메라 FLIR A50</li>
               <li>RTSP / ONVIF</li>
             </ul>
           </div>
@@ -702,13 +792,104 @@
           <div class="card">
             <h3>ACTION · PLATFORM</h3>
             <ul>
-              <li>ESP32 · 경광등 · 부저</li>
+              <li>ESP32 · 릴레이 · 24V 경광등</li>
               <li>MQTT / FastAPI</li>
               <li>PostgreSQL</li>
               <li>React 대시보드</li>
             </ul>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ===== 하드웨어 구성 (report/하드웨어_부품_사양_보고서.md) ===== -->
+    <section class="block hw" id="hardware">
+      <div class="wrap">
+        <span class="eyebrow">Hardware</span>
+        <h2>카메라에서 경광등까지,<br>부품이 이렇게 이어집니다</h2>
+        <p class="lead">제조공장 1개 작업구역 기준입니다. RGB 카메라 6대, 열화상 카메라 2대, Edge AI 장비 2대, 제어함 2개로 구성합니다.</p>
+
+        <div class="hw-chain">
+          <div class="hw-stage">
+            <h3>감지</h3>
+            <div class="hw-node"><b>RGB IP 카메라 ×6</b><span>Hikvision DS-2CD2023G2-I · 1080p</span><div class="spec mono">PoE 802.3af · 최대 7W</div></div>
+            <div class="hw-node"><b>열화상 카메라 ×2</b><span>FLIR A50 · 온도 데이터</span><div class="spec mono">PoE · 8.1W</div></div>
+          </div>
+          <div class="hw-link"><b>PoE 스위치</b><span class="hw-arrow" aria-hidden="true"></span><small>Ethernet<br>RTSP · ONVIF</small></div>
+          <div class="hw-stage">
+            <h3>판단</h3>
+            <div class="hw-node"><b>Jetson Orin Nano ×2</b><span>YOLOE · Pose · ByteTrack · 열 분석</span><div class="spec mono">DC 19V · 25W 모드</div></div>
+            <div class="hw-node"><b>NVMe SSD</b><span>모델 · 이벤트 클립</span><div class="spec mono">M.2 PCIe</div></div>
+          </div>
+          <div class="hw-link"><b>MQTT</b><span class="hw-arrow" aria-hidden="true"></span><small>Wi-Fi<br>UART 예비</small></div>
+          <div class="hw-stage">
+            <h3>제어</h3>
+            <div class="hw-node"><b>ESP32</b><span>경보 명령 수신 · 하트비트</span><div class="spec mono">3.3V · 피크 240mA</div></div>
+            <div class="hw-node"><b>릴레이 4채널</b><span>적색 · 황색 · 부저 · 예비</span><div class="spec mono">5V · 채널당 71mA</div></div>
+            <div class="hw-node opt"><b>연기 센서 (선택)</b><span>MQ-2 · 화재 오경보 보조</span><div class="spec mono">5V · 150mA</div></div>
+          </div>
+          <div class="hw-link"><b>24V</b><span class="hw-arrow" aria-hidden="true"></span><small>릴레이 접점<br>ON / OFF</small></div>
+          <div class="hw-stage act">
+            <h3>경고</h3>
+            <div class="hw-node"><b>경광등 + 부저</b><span>PATLITE LR6 · IP65</span><div class="spec mono">DC 24V · 250mA</div></div>
+          </div>
+        </div>
+
+        <div class="hw-server">
+          <b>Jetson</b><span class="arrow">→ MQTT / REST →</span><b>FastAPI 서버 · PostgreSQL · NAS</b><span class="arrow">→ Web Push · SMS →</span><b>관리자</b>
+          <span class="why-local">감지부터 경광등까지는 현장 안에서 끝납니다. 서버나 인터넷이 멈춰도 경보는 울립니다.</span>
+        </div>
+
+        <h3 class="subhead">부품별 전압 · 전류 · 통신</h3>
+        <div class="hw-table">
+          <table>
+            <thead>
+              <tr><th>부품</th><th>기준 모델</th><th>수량</th><th>전압</th><th>전류 · 전력</th><th>통신 · 인터페이스</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Edge AI 컴퓨터</td><td class="m">Jetson Orin Nano Super 8GB</td><td>2</td><td class="v">DC 9–19V</td><td class="v">7 / 15 / 25W 모드</td><td>GbE, USB 3.2, CSI, 40핀 GPIO·UART·I2C·SPI (3.3V)</td></tr>
+              <tr><td>RGB 카메라</td><td class="m">Hikvision DS-2CD2023G2-I</td><td>6</td><td class="v">PoE 802.3af / DC 12V</td><td class="v">최대 7W</td><td>Ethernet, RTSP, ONVIF, H.264/H.265</td></tr>
+              <tr><td>열화상 카메라</td><td class="m">Teledyne FLIR A50</td><td>2</td><td class="v">DC 24/48V / PoE</td><td class="v">7.5–8.1W</td><td>Ethernet, RTSP(방사측정), Modbus TCP</td></tr>
+              <tr><td>MCU</td><td class="m">ESP32-WROOM-32E</td><td>2</td><td class="v">3.3V (보드 5V 입력)</td><td class="v">피크 약 240mA</td><td>Wi-Fi(MQTT), UART, I2C, SPI, ADC, GPIO</td></tr>
+              <tr><td>릴레이 모듈</td><td class="m">SRD-05VDC-SL-C 4채널</td><td>2</td><td class="v">코일 5V</td><td class="v">채널당 71.4mA</td><td>GPIO 입력, 접점 10A 250VAC / 30VDC</td></tr>
+              <tr><td>경광등 + 부저</td><td class="m">PATLITE LR6 부저 내장형</td><td>2</td><td class="v">DC 24V</td><td class="v">약 250mA</td><td>릴레이로 전원 ON/OFF</td></tr>
+              <tr><td>연기 센서<span class="opt-tag">선택</span></td><td class="m">MQ-2 모듈</td><td>2</td><td class="v">5V (히터)</td><td class="v">약 150mA</td><td>아날로그 0–5V(분압 후 ADC), 디지털</td></tr>
+              <tr><td>PoE 스위치</td><td class="m">8포트 PoE+ 기가비트</td><td>1</td><td class="v">AC 220V</td><td class="v">PoE 예산 120W 이상 권장</td><td>IEEE 802.3af/at, 1Gbps</td></tr>
+              <tr><td>전원 공급기</td><td class="m">24V SMPS + 24V→5V 벅 컨버터</td><td>2</td><td class="v">AC 220V → 24V → 5V</td><td class="v">24V 60W · 5V 3A</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="subhead">전력 예산</h3>
+        <div class="hw-power">
+          <div>
+            <div class="hw-bar" role="img" aria-label="최대 소비전력 약 126W 중 카메라 58W, Jetson 50W, 경광등 12W, 제어부 6W">
+              <i style="width:33.3%; background:#6CC4F0"></i>
+              <i style="width:12.8%; background:#0284C7"></i>
+              <i style="width:39.6%; background:#8B7CF6"></i>
+              <i style="width:9.5%; background:var(--lv3)"></i>
+              <i style="width:4.8%; background:var(--lv2)"></i>
+            </div>
+            <ul class="hw-legend">
+              <li style="--c:#6CC4F0">RGB 카메라 <b>42W</b></li>
+              <li style="--c:#0284C7">열화상 카메라 <b>16.2W</b></li>
+              <li style="--c:#8B7CF6">Jetson ×2 <b>50W</b></li>
+              <li style="--c:var(--lv3)">경광등·부저 <b>12W</b></li>
+              <li style="--c:var(--lv2)">ESP32·릴레이·센서 <b>6W</b></li>
+            </ul>
+          </div>
+          <div class="hw-total">
+            <div class="num">약 <span class="mono">126W</span></div>
+            <p>최대치 기준, 하루 약 3kWh. 월 전력비 10만 원 예산 안에 들어갑니다.</p>
+          </div>
+        </div>
+
+        <ul class="hw-notes">
+          <li><b>PoE 예산을 넉넉히</b>카메라 8대가 58W를 씁니다. 63W짜리 스위치로는 여유가 거의 없어 120W 이상을 씁니다.</li>
+          <li><b>3.3V 신호 지키기</b>Jetson과 ESP32 핀은 3.3V입니다. 릴레이는 절연형 모듈로, 5V 센서 출력은 분압해서 연결합니다.</li>
+          <li><b>멈춤도 알린다</b>ESP32가 Jetson 신호를 일정 시간 못 받으면 황색등을 켜 시스템 이상을 알립니다.</li>
+        </ul>
+        <p class="hw-source">※ 사양은 제조사·판매처 데이터시트 기준이며, 구매 전 정확한 모델로 다시 확인합니다.</p>
       </div>
     </section>
 
