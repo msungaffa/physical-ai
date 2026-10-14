@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
     const byHash = new Map<string, Chunk>();
     for (const c of await collect()) byHash.set(await sha256(`${c.source}\n${c.title}\n${c.content}`), c);
 
-    const { data: existing, error } = await supabase.from("site_chunks").select("content_hash");
+    const { data: existing, error } = await supabase.from("site_chunks").select("content_hash, sector");
     if (error) throw error;
     const existingHashes = new Set(existing.map((r) => r.content_hash));
 
@@ -96,6 +96,21 @@ Deno.serve(async (req) => {
     for (let i = 0; i < stale.length; i += 100) {
       const { error } = await supabase.from("site_chunks").delete().in("content_hash", stale.slice(i, i + 100));
       if (error) throw error;
+    }
+
+    // 섹터는 해시에 넣지 않으므로, 분류 규칙만 바뀐 청크는 다시 임베딩하지 않고 섹터만 고친다
+    const resector = new Map<string, string[]>();
+    for (const r of existing) {
+      const sector = byHash.get(r.content_hash)?.sector;
+      if (sector && sector !== r.sector) resector.set(sector, [...resector.get(sector) ?? [], r.content_hash]);
+    }
+    let resectored = 0;
+    for (const [sector, hashes] of resector) {
+      for (let i = 0; i < hashes.length; i += 100) {
+        const { error } = await supabase.from("site_chunks").update({ sector }).in("content_hash", hashes.slice(i, i + 100));
+        if (error) throw error;
+      }
+      resectored += hashes.length;
     }
 
     // 연관 질문: 사용자 질문과 비교하므로 질문용(RETRIEVAL_QUERY)으로 임베딩, 질문 문장 자체가 키
@@ -121,7 +136,7 @@ Deno.serve(async (req) => {
     }
 
     return json({
-      chunks: { total: byHash.size, added: added.length, removed: stale.length },
+      chunks: { total: byHash.size, added: added.length, removed: stale.length, resectored },
       questions: { total: questions.length, added: addedQuestions.length, removed: staleQuestions.length },
       remaining: pending.length - added.length + pendingQuestions.length - addedQuestions.length,
     });

@@ -13,6 +13,8 @@ const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 const MATCH_COUNT = 6;
 const MATCH_THRESHOLD = 0.5;
 const RELATED_COUNT = 3;
+// 비전QC는 별도 제품 사례라 비전QC를 물을 때만 검색한다 (안전관리 시스템의 비용·엣지 질문에 섞이지 않게)
+const VISIONQC_PATTERN = /비전\s*QC|불량/i;
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -33,7 +35,7 @@ const SYSTEM_PROMPT = `너는 "AI 기반 작업장 안전관리 시스템" 소�
 - 3~6문장 정도로 간결하게, 필요하면 짧은 목록을 쓴다. 마크다운 굵게(**) 표시는 쓰지 않는다.`;
 
 type Turn = { role: "user" | "assistant"; text: string };
-type Match = { id: number; source: string; title: string; content: string; similarity: number };
+type Match = { id: number; source: string; title: string; content: string; sector: string; similarity: number };
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -133,10 +135,12 @@ Deno.serve(async (req) => {
     // (버튼 질문은 앞 주제가 섞이면 엉뚱한 문서를 찾으므로 질문만 쓴다)
     const lastUser = standalone === true ? undefined : recent.findLast((t) => t.role === "user")?.text;
     const embedding = await embedQuery(lastUser ? `${lastUser}\n${question}` : question);
+    const excludeSectors = VISIONQC_PATTERN.test(`${lastUser ?? ""}\n${question}`) ? [] : ["visionqc"];
     const { data, error } = await supabase.rpc("match_site_chunks", {
       query_embedding: JSON.stringify(embedding),
       match_count: MATCH_COUNT,
       match_threshold: MATCH_THRESHOLD,
+      exclude_sectors: excludeSectors,
     });
     if (error) throw error;
     const matches = (data ?? []) as Match[];
@@ -163,6 +167,7 @@ Deno.serve(async (req) => {
       sources,
       top_similarity: matches[0]?.similarity ?? null,
       model,
+      sectors: { excluded: excludeSectors, hits: matches.map((m) => m.sector) },
     });
     if (logError) console.error(logError);
 
