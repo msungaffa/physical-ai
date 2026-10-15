@@ -113,6 +113,12 @@ Deno.serve(async (req) => {
       resectored += hashes.length;
     }
 
+    // 청크가 바뀌었으면 챗봇이 섹터를 고를 때 쓰는 섹터 대표 벡터도 다시 계산한다
+    if (added.length || stale.length || resectored) {
+      const { error } = await supabase.rpc("refresh_site_sector_centroids");
+      if (error) throw error;
+    }
+
     // 연관 질문: 사용자 질문과 비교하므로 질문용(RETRIEVAL_QUERY)으로 임베딩, 질문 문장 자체가 키
     const questions: string[] = [...new Set<string>(
       JSON.parse(await fetchText("data/chatbot-questions.json")).questions,

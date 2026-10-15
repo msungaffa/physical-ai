@@ -47,13 +47,14 @@ git push -u origin main --force
 홈페이지 오른쪽 아래 챗봇은 `index.html`, `PRD/PRD.md`, `report/*.md` 내용을 근거로 답합니다.
 
 ```
-질문 → Gemini 임베딩(768차원) → Supabase pgvector 검색(site_chunks) → Gemini 답변 생성 → site_chat_logs 기록
+질문 → Gemini 임베딩(768차원) → 관련 섹터 고르기 → 그 섹터의 site_chunks만 pgvector 검색 → Gemini 답변 생성 → site_chat_logs 기록
 ```
 
 | 구성 | 위치 |
 |---|---|
 | DB 스키마 (`site_chunks`, `site_chat_logs`, `match_site_chunks`) | `supabase/migrations/20261013070000_site_rag.sql` |
 | 섹터 칸·섹터 필터 검색 | `supabase/migrations/20261014090000_site_chunk_sectors.sql` |
+| 섹터 대표 벡터·섹터 고르기 (`site_sector_centroids`, `match_site_sectors`) | `supabase/migrations/20261015090000_site_sector_routing.sql` |
 | 문서 적재 함수 `site-ingest` (GitHub에서 문서를 읽어 청크·임베딩) | `supabase/functions/site-ingest/` |
 | 답변 함수 `chat` | `supabase/functions/chat/index.ts` |
 | 화면 위젯 | `chatbot.js` |
@@ -97,6 +98,27 @@ git push -u origin main --force
 - 분류 규칙은 `supabase/functions/site-ingest/chunk.ts`에 있습니다. 홈페이지는 `<section id>`, PRD는 `##` 큰 제목, 보고서는 파일 이름으로 정합니다. 새 보고서를 추가하면 `REPORT_SECTORS`에 한 줄 넣어 주세요.
 - 규칙만 바꾸고 `site-ingest`를 실행하면 다시 임베딩하지 않고 섹터만 고칩니다 (응답의 `resectored`).
 - 챗봇은 질문에 "비전QC"나 "불량"이 없으면 `visionqc` 섹터를 빼고 검색합니다. 안전관리 시스템의 투자비·Edge 질문에 비전QC 수치가 섞이던 문제를 막기 위해서입니다.
+
+### 섹터 고르기 (관련 섹터만 비교하기)
+
+질문마다 모든 쪽지를 비교하지 않고, 질문과 관련된 섹터의 쪽지만 비교합니다. 전처리를 물었는데 사업성·현장조사 쪽지까지 볼 필요는 없기 때문입니다. 비교할 양이 줄고, 엉뚱한 섹터의 쪽지가 답에 섞이는 일도 줄어듭니다.
+
+```
+질문 벡터 → 섹터 대표 벡터와 비교 → 가까운 섹터 2~3개 고르기 → 그 섹터 쪽지만 검색
+                                                     └ 최고 유사도 < 0.6이면 전체에서 다시 검색
+```
+
+- 섹터 대표 벡터: 섹터마다 쪽지 임베딩의 평균을 `site_sector_centroids`에 둡니다. `site-ingest`가 쪽지를 바꾸면 자동으로 다시 계산합니다.
+- 고르는 규칙 (`chat/index.ts`의 `ROUTE_*`): 1·2위 섹터는 항상 보고, 3위는 1위와 유사도 차이가 0.03 이내일 때만 봅니다. 섹터 1·2위가 비슷하게 나오는 질문이 많아서(예: "어떤 AI 모델을 쓰나요?"는 research 0.740, ai 0.735) 한 섹터만 고르면 놓칩니다.
+- 이 규칙은 연관 질문 35개로 맞췄습니다. 질문당 비교하는 쪽지가 162개에서 평균 60개로 줄었고, 전체 검색 때의 1위 쪽지를 35개 중 33개에서 그대로 찾았습니다.
+- 테이블을 섹터별로 나누지 않고 칸 하나로 구분합니다. 여러 섹터에 걸친 질문도 한 번에 검색할 수 있기 때문입니다.
+- `site_chat_logs.sectors`에 고른 섹터(`routed`), 전체 검색으로 돌아갔는지(`fallback`), 섹터별 점수(`scores`)가 남습니다.
+
+```sql
+-- 섹터 고르기 결과 보기 (fallback이 자주 true면 규칙을 다시 맞춘다)
+select question, sectors->'routed' routed, sectors->'fallback' fallback, top_similarity
+from site_chat_logs where sectors ? 'routed' order by created_at desc;
+```
 
 ```sql
 -- 섹터별 쪽지 수

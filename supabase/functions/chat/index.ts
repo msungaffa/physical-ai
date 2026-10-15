@@ -15,6 +15,13 @@ const MATCH_THRESHOLD = 0.5;
 const RELATED_COUNT = 3;
 // 비전QC는 별도 제품 사례라 비전QC를 물을 때만 검색한다 (안전관리 시스템의 비용·엣지 질문에 섞이지 않게)
 const VISIONQC_PATTERN = /비전\s*QC|불량/i;
+// 섹터 고르기: 질문과 가까운 섹터 2개는 항상 보고, 3위는 1위와 차이가 이 값 이내일 때만 본다
+// (연관 질문 35개로 맞춘 값: 비교 청크 162 → 평균 60개, 전체 검색 1위 청크를 33개 질문에서 그대로 찾음)
+const ROUTE_MIN_SECTORS = 2;
+const ROUTE_MAX_SECTORS = 3;
+const ROUTE_MARGIN = 0.03;
+// 고른 섹터에서 찾은 최고 유사도가 이보다 낮으면 섹터를 잘못 고른 것으로 보고 전체에서 다시 찾는다
+const ROUTE_FALLBACK_SIMILARITY = 0.6;
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -102,6 +109,37 @@ async function generate(question: string, context: string, history: Turn[]) {
   throw new Error(lastError);
 }
 
+// 질문 벡터를 섹터 대표 벡터(site_sector_centroids)와 비교해 볼 섹터를 고른다. 실패하면 null(전체 검색)
+async function routeSectors(embedding: number[], excludeSectors: string[]) {
+  const { data, error } = await supabase.rpc("match_site_sectors", {
+    query_embedding: JSON.stringify(embedding),
+    exclude_sectors: excludeSectors,
+  });
+  if (error || !data?.length) {
+    if (error) console.error(error);
+    return null;
+  }
+  const ranked = data as { sector: string; similarity: number }[];
+  const top = ranked[0].similarity;
+  const picked = ranked
+    .filter((s, i) => i < ROUTE_MIN_SECTORS || (i < ROUTE_MAX_SECTORS && s.similarity >= top - ROUTE_MARGIN))
+    .map((s) => s.sector);
+  const scores = Object.fromEntries(ranked.map((s) => [s.sector, Math.round(s.similarity * 1000) / 1000]));
+  return { picked, scores };
+}
+
+async function searchChunks(embedding: number[], includeSectors: string[] | null, excludeSectors: string[]) {
+  const { data, error } = await supabase.rpc("match_site_chunks", {
+    query_embedding: JSON.stringify(embedding),
+    match_count: MATCH_COUNT,
+    match_threshold: MATCH_THRESHOLD,
+    include_sectors: includeSectors,
+    exclude_sectors: excludeSectors,
+  });
+  if (error) throw error;
+  return (data ?? []) as Match[];
+}
+
 // 방금 대화와 의미가 가까운 연관 질문 (이미 물어본 질문은 제외). 실패해도 답변은 그대로 보낸다
 async function relatedQuestions(embedding: number[], asked: string[]): Promise<string[]> {
   const { data, error } = await supabase.rpc("match_site_questions", {
@@ -136,14 +174,11 @@ Deno.serve(async (req) => {
     const lastUser = standalone === true ? undefined : recent.findLast((t) => t.role === "user")?.text;
     const embedding = await embedQuery(lastUser ? `${lastUser}\n${question}` : question);
     const excludeSectors = VISIONQC_PATTERN.test(`${lastUser ?? ""}\n${question}`) ? [] : ["visionqc"];
-    const { data, error } = await supabase.rpc("match_site_chunks", {
-      query_embedding: JSON.stringify(embedding),
-      match_count: MATCH_COUNT,
-      match_threshold: MATCH_THRESHOLD,
-      exclude_sectors: excludeSectors,
-    });
-    if (error) throw error;
-    const matches = (data ?? []) as Match[];
+    // 관련 섹터의 청크만 비교하고, 거기서 마땅한 게 없으면 전체에서 다시 찾는다
+    const route = await routeSectors(embedding, excludeSectors);
+    let matches = await searchChunks(embedding, route?.picked ?? null, excludeSectors);
+    const fallback = route !== null && (matches[0]?.similarity ?? 0) < ROUTE_FALLBACK_SIMILARITY;
+    if (fallback) matches = await searchChunks(embedding, null, excludeSectors);
 
     const context = matches
       .map((m, i) => `(${i + 1}) [${m.source} · ${m.title}]\n${m.content}`)
@@ -167,7 +202,13 @@ Deno.serve(async (req) => {
       sources,
       top_similarity: matches[0]?.similarity ?? null,
       model,
-      sectors: { excluded: excludeSectors, hits: matches.map((m) => m.sector) },
+      sectors: {
+        excluded: excludeSectors,
+        routed: route?.picked ?? null,
+        fallback,
+        scores: route?.scores ?? null,
+        hits: matches.map((m) => m.sector),
+      },
     });
     if (logError) console.error(logError);
 
