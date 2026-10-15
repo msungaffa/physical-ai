@@ -375,6 +375,56 @@
     .train p { color: var(--muted); font-size: 0.92rem; }
     .model-note { margin-top: 16px; color: var(--muted); font-size: 0.88rem; }
 
+    /* ----- 추론 엔진 비교 ----- */
+    .eng { margin-top: 40px; display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 32px; align-items: start; }
+    .eng-pick { border-radius: 18px; padding: 28px; background: var(--dark); color: #E6ECF7; }
+    .eng-pick .role { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.1em; color: #6CC4F0; }
+    .eng-pick h3 { margin: 6px 0 4px; font-size: 1.6rem; color: #fff; line-height: 1.3; }
+    .eng-pick h3 small { display: block; font-size: 0.95rem; font-weight: 600; color: #9FB0CC; }
+    .eng-pick ul { margin-top: 18px; list-style: none; display: grid; gap: 10px; }
+    .eng-pick li { padding: 12px 14px; border-radius: 10px; background: rgba(255,255,255,0.06); font-size: 0.93rem; color: #C9D6EA; }
+    .eng-pick li b { display: block; color: #fff; }
+    .eng-path { margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 0.82rem; color: #9FB0CC; }
+    .eng-path span { padding: 3px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); color: #fff; }
+    .eng-path span.on { background: var(--accent); border-color: var(--accent); }
+
+    .eng-chart { border: 1px solid var(--line); border-radius: 18px; padding: 24px; background: var(--surface); }
+    .eng-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+    .eng-tabs button {
+      font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      padding: 6px 14px; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+    }
+    .eng-tabs button:hover { color: var(--ink); border-color: var(--ink); }
+    .eng-tabs button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+    .eng-desc { margin-top: 14px; font-size: 0.88rem; color: var(--muted); min-height: 1.5em; }
+    .eng-bars { margin-top: 14px; list-style: none; display: grid; gap: 14px; }
+    .eng-bars li { display: grid; grid-template-columns: 116px 1fr 84px; gap: 12px; align-items: center; }
+    .eng-bars .name { font-weight: 700; font-size: 0.93rem; line-height: 1.3; }
+    .eng-bars .name small { display: block; font-weight: 500; font-size: 0.75rem; color: var(--muted); }
+    .eng-bars .track { height: 14px; border-radius: 999px; background: var(--bg); overflow: hidden; }
+    .eng-bars .fill { display: block; height: 100%; border-radius: 999px; background: #B9C6D8; transition: width 0.5s ease; }
+    .eng-bars li.pick .fill { background: var(--accent); }
+    .eng-bars li.best .val { color: var(--accent-dark); }
+    .eng-bars .val { text-align: right; font-weight: 700; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+    .eng-bars .pick-tag { display: inline-block; margin-left: 4px; font-size: 0.68rem; font-weight: 800; padding: 0 6px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-dark); vertical-align: 1px; }
+    .eng-note { margin-top: 14px; font-size: 0.8rem; color: var(--muted); }
+    .eng-facts { margin-top: 28px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; }
+    .eng-facts li { padding: 18px 20px; border-radius: 12px; background: var(--accent-soft); color: var(--accent-dark); font-size: 0.93rem; }
+    .eng-facts b { display: block; color: var(--ink); margin-bottom: 2px; }
+    .eng-facts .mono { font-weight: 700; }
+
+    @media (max-width: 960px) {
+      .eng { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .eng-facts { grid-template-columns: 1fr; }
+      .eng-bars li { grid-template-columns: 92px 1fr 70px; gap: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .eng-bars .fill { transition: none; }
+    }
+
     /* ----- 하드웨어 구성 (어두운 구역) ----- */
     section.block.hw { background: var(--dark); color: #E6ECF7; border-top-color: var(--dark); }
     .hw .eyebrow { color: #6CC4F0; }
@@ -506,6 +556,7 @@
         <li><a href="#roi">사업성</a></li>
         <li><a href="#poc">PoC</a></li>
         <li><a href="#model">모델·검증</a></li>
+        <li><a href="#engine">추론 엔진</a></li>
       </ul>
     </nav>
   </header>
@@ -778,7 +829,7 @@
               <li>YOLOE</li>
               <li>MediaPipe Pose</li>
               <li>ByteTrack</li>
-              <li>TensorRT</li>
+              <li>ONNX Runtime + TensorRT</li>
             </ul>
           </div>
           <div class="card">
@@ -1130,6 +1181,7 @@
               <tr><td>이상 고온</td><td>딥러닝, 기준값 규칙</td><td class="pick">온도 + 상승률 규칙</td><td class="why">온도 자체가 신호라 학습이 필요 없습니다.</td></tr>
               <tr><td>학습 데이터 라벨링</td><td>수작업, SAM 3</td><td class="pick">SAM 3</td><td class="why">박스·공구를 자동으로 표시해 라벨링 시간을 줄입니다.</td></tr>
               <tr><td>위험도 판단</td><td>학습형 분류기, 규칙 엔진</td><td class="pick">규칙 엔진</td><td class="why">안전 경보는 이유를 설명할 수 있어야 합니다.</td></tr>
+              <tr><td>추론 엔진</td><td>ONNX Runtime, OpenVINO, NCNN, TFLite</td><td class="pick">ONNX Runtime → TensorRT</td><td class="why">속도가 가장 고르고, Jetson GPU에서는 TensorRT로 바로 이어집니다. <a href="#engine">비교 결과 보기</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -1163,6 +1215,48 @@
           </table>
         </div>
         <p class="model-note">※ PoC 수행 계획입니다. 실험을 마치면 결과 칸을 실측값으로 채웁니다.</p>
+      </div>
+    </section>
+
+    <!-- ===== 추론 엔진 비교 (report/engine_compare.md) ===== -->
+    <section class="block" id="engine">
+      <div class="wrap">
+        <span class="eyebrow">Inference engine</span>
+        <h2>같은 모델, 어떤 엔진으로<br>돌릴지 직접 재 봤습니다</h2>
+        <p class="lead">검출 모델(yolo26n)을 네 가지 추론 엔진으로 바꿔 가며 같은 사진 100장을 300번 돌렸습니다. 정확도는 모두 같았고, 차이는 속도와 안정성에서 났습니다.</p>
+
+        <div class="eng">
+          <div class="eng-pick">
+            <div class="role">우리 제품의 선택</div>
+            <h3>ONNX Runtime<small>현장 장비(Jetson)에서는 TensorRT 가속</small></h3>
+            <ul>
+              <li><b>가장 고르게 빠릅니다</b>느린 쪽 5%도 68 ms. 경보가 늦어지는 순간이 가장 적습니다.</li>
+              <li><b>정확도 손해가 없습니다</b>네 엔진 모두 mAP50 0.6250으로 같습니다.</li>
+              <li><b>Jetson GPU로 바로 이어집니다</b>같은 ONNX 파일을 TensorRT 실행기로 돌리면 됩니다.</li>
+            </ul>
+            <div class="eng-path" aria-label="배포 경로">
+              <span>PyTorch 학습</span>→<span class="on">ONNX 변환</span>→<span class="on">ONNX Runtime 검증</span>→<span class="on">Jetson TensorRT FP16</span>
+            </div>
+          </div>
+
+          <div class="eng-chart">
+            <div class="eng-tabs" role="group" aria-label="비교 항목">
+              <button type="button" data-k="p50" aria-pressed="true">추론 속도</button>
+              <button type="button" data-k="p95" aria-pressed="false">느릴 때 (p95)</button>
+              <button type="button" data-k="fps" aria-pressed="false">초당 처리 (FPS)</button>
+              <button type="button" data-k="load" aria-pressed="false">로드 시간</button>
+            </div>
+            <p class="eng-desc" aria-live="polite"></p>
+            <ul class="eng-bars"></ul>
+            <p class="eng-note">※ AMD Ryzen 5 7530U 노트북 CPU, 6스레드, FP32, 640×640 기준 실측입니다. Jetson 실측은 PoC에서 진행합니다.</p>
+          </div>
+        </div>
+
+        <ul class="eng-facts">
+          <li><b>OpenVINO</b>중앙값은 <span class="mono">57 ms</span>로 가장 빠르지만, 느릴 때 <span class="mono">100 ms</span>까지 튑니다. Intel 장비라면 다시 볼 후보입니다.</li>
+          <li><b>NCNN · TFLite</b>ARM 모바일용 엔진이라 이 PC에서는 1.6~2배 느렸습니다. 라즈베리파이로 바꾸면 다시 잽니다.</li>
+          <li><b>용량</b>모두 약 <span class="mono">9.5 MB</span>(FP32)입니다. FP16으로 바꾸면 절반 가까이 줄어듭니다.</li>
+        </ul>
       </div>
     </section>
   </main>
@@ -1308,6 +1402,54 @@
     });
   });
   draw('raw');
+})();
+
+/* 추론 엔진 비교 (report/engine_compare.md 실측값) */
+(function () {
+  var list = document.querySelector('.eng-bars');
+  if (!list) return;
+  var engines = [
+    { name: 'ONNX Runtime', by: 'Microsoft', pick: true, p50: 59.60, p95: 68.44, fps: 13.0, load: 246 },
+    { name: 'OpenVINO', by: 'Intel', p50: 57.24, p95: 100.00, fps: 12.8, load: 1601 },
+    { name: 'TFLite', by: 'Google', p50: 91.38, p95: 99.50, fps: 9.4, load: 282 },
+    { name: 'NCNN', by: 'Tencent', p50: 117.16, p95: 129.53, fps: 7.4, load: 110 }
+  ];
+  var metrics = {
+    p50: { unit: ' ms', low: true, desc: '사진 한 장을 추론하는 시간의 중앙값입니다. 짧을수록 좋습니다.' },
+    p95: { unit: ' ms', low: true, desc: '가장 느린 5% 경계입니다. 경보가 늦어지는 최악의 순간에 가깝습니다.' },
+    fps: { unit: '', low: false, desc: '전처리부터 후처리까지 1초에 처리한 장 수입니다. 클수록 좋습니다.' },
+    load: { unit: ' ms', low: true, desc: '모델 파일을 읽어 준비하는 시간입니다. 장비를 다시 켤 때 영향을 줍니다.' }
+  };
+  var desc = document.querySelector('.eng-desc');
+
+  list.innerHTML = engines.map(function (e) {
+    return '<li' + (e.pick ? ' class="pick"' : '') + '><span class="name">' + e.name +
+      (e.pick ? '<span class="pick-tag">선택</span>' : '') + '<small>' + e.by + '</small></span>' +
+      '<span class="track"><span class="fill" style="width:0"></span></span><span class="val mono"></span></li>';
+  }).join('');
+  var rows = list.querySelectorAll('li');
+
+  function show(k) {
+    var m = metrics[k];
+    var vals = engines.map(function (e) { return e[k]; });
+    var max = Math.max.apply(null, vals);
+    var best = m.low ? Math.min.apply(null, vals) : max;
+    desc.textContent = m.desc;
+    engines.forEach(function (e, i) {
+      rows[i].querySelector('.fill').style.width = Math.max(3, e[k] / max * 100) + '%';
+      rows[i].querySelector('.val').textContent = (k === 'fps' ? e[k].toFixed(1) : e[k] >= 1000 ? e[k].toLocaleString() : e[k]) + m.unit;
+      rows[i].classList.toggle('best', e[k] === best);
+    });
+  }
+
+  var tabs = document.querySelectorAll('.eng-tabs button');
+  tabs.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      tabs.forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+      show(btn.dataset.k);
+    });
+  });
+  requestAnimationFrame(function () { show('p50'); });
 })();
 </script>
 <!-- 안내 챗봇 (Supabase Edge Function "chat", 홈페이지·PRD·보고서 기반 RAG) -->

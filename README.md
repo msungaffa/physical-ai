@@ -87,7 +87,7 @@ git push -u origin main --force
 |---|---|---|
 | `product` | 제품 개요·문제·시나리오·기능·위험 단계·범위 | 홈페이지, PRD |
 | `hardware` | 하드웨어 부품·기술 스택 | 하드웨어 보고서, 홈페이지, PRD |
-| `ai` | AI 모델·데이터 파이프라인·학습·검증 | 모델 보고서, preprocess, 홈페이지 |
+| `ai` | AI 모델·데이터 파이프라인·학습·검증·추론 엔진 | 모델 보고서, preprocess, 엔진 비교, 홈페이지 |
 | `business` | 성공 지표·ROI·PoC | PRD, 홈페이지 |
 | `survey` | 현장 조사 체크리스트 | 현장조사 체크리스트 |
 | `research` | 일반 비전 AI 모델 비교 조사 | 비전 AI 모델 비교 보고서 |
