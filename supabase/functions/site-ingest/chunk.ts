@@ -5,14 +5,14 @@ export type Chunk = { source: string; title: string; content: string; sector: Se
 
 // 홈페이지: <section id>로 정한다. 표에 없는 섹션(첫 화면, 문제, 작동 방식, 위험 단계 등)은 product
 const HTML_SECTORS: Record<string, Sector> = {
-  stack: "hardware", hardware: "hardware",
+  stack: "hardware", hardware: "hardware", runtime: "hardware",
   ai: "ai", pipeline: "ai", model: "ai", engine: "ai",
   roi: "business", poc: "business",
 };
 
 // 보고서: 파일 이름으로 정한다. 규칙에 없는 새 보고서는 general
 const REPORT_SECTORS: [RegExp, Sector][] = [
-  [/하드웨어/, "hardware"],
+  [/하드웨어|SBC|컨테이너/, "hardware"],
   [/모델_학습|preprocess|engine_compare/, "ai"],
   [/비전_AI_모델_비교/, "research"],
   [/현장조사/, "survey"],
