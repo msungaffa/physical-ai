@@ -514,6 +514,76 @@
       .hw-notes { grid-template-columns: 1fr; }
     }
 
+    /* ----- Edge 런타임 (컨테이너 구조) ----- */
+    .rt-sim { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .rt-sim button {
+      font: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+      padding: 8px 16px; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+    }
+    .rt-sim button:hover { color: var(--ink); border-color: var(--ink); }
+    .rt-sim button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+    .rt-host { margin-top: 20px; background: var(--dark); color: #E6ECF7; border-radius: 20px; padding: 24px; }
+    .rt-host-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px; }
+    .rt-host-head b { color: #fff; font-size: 1.05rem; }
+    .rt-host-head span { font-size: 0.8rem; color: #9FB0CC; }
+    .rt-hw { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; list-style: none; }
+    .rt-hw li { font-size: 0.75rem; padding: 2px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); color: #C9D6EA; }
+    .rt-grid { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .rt-box {
+      position: relative; border-radius: 14px; padding: 16px 18px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-left: 4px solid var(--z);
+      transition: opacity 0.3s, box-shadow 0.3s, background 0.3s;
+    }
+    .rt-box.wide { grid-column: 1 / -1; }
+    .rt-box[data-zone="soft"]  { --z: #7F90AE; }
+    .rt-box[data-zone="net"]   { --z: var(--lv0); }
+    .rt-box[data-zone="spine"] { --z: #6CC4F0; }
+    .rt-box[data-zone="hard"]  { --z: var(--lv4); }
+    .rt-top { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; padding-right: 96px; }
+    .rt-num { color: #9FB0CC; font-weight: 700; }
+    .rt-zone { font-weight: 700; padding: 0 8px; border-radius: 999px; border: 1px solid var(--z); color: var(--z); }
+    .rt-box h3 { margin: 6px 0 4px; font-size: 1.1rem; color: #fff; }
+    .rt-box p { font-size: 0.88rem; color: #C9D6EA; }
+    .rt-io { margin-top: 8px; font-size: 0.78rem; color: #6CC4F0; }
+    .rt-tags { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; list-style: none; }
+    .rt-tags li { font-size: 0.72rem; padding: 1px 8px; border-radius: 6px; background: rgba(255,255,255,0.08); color: #C9D6EA; }
+    .rt-state { position: absolute; top: 14px; right: 14px; font-size: 0.72rem; font-weight: 800; padding: 1px 10px; border-radius: 999px; display: none; }
+    .rt-box.down { opacity: 0.4; }
+    .rt-box.down .rt-state { display: inline-block; background: var(--lv4); color: #fff; }
+    .rt-box.cover { background: rgba(108,196,240,0.12); box-shadow: 0 0 0 2px #6CC4F0; }
+    .rt-box.cover .rt-state { display: inline-block; background: #6CC4F0; color: var(--dark); }
+
+    .rt-link { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 10px 0; font-size: 0.82rem; color: var(--muted); }
+    .rt-link::before { content: ""; width: 2px; height: 30px; background: linear-gradient(var(--line), var(--accent)); }
+    .rt-link .on { color: var(--accent-dark); font-weight: 700; }
+
+    .rt-edge { display: grid; grid-template-columns: 1.3fr 1fr; gap: 14px; }
+    .rt-esp, .rt-light { position: relative; border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; background: var(--surface); transition: box-shadow 0.3s; }
+    .rt-esp h3 { font-size: 1rem; padding-right: 110px; }
+    .rt-esp p { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+    .rt-esp .rt-state { top: 18px; right: 18px; }
+    .rt-esp.cover { box-shadow: 0 0 0 2px var(--accent); }
+    .rt-esp.cover .rt-state { display: inline-block; background: var(--accent); color: #fff; }
+    .rt-light { display: flex; align-items: center; gap: 16px; }
+    .rt-lamp { flex: none; width: 26px; height: 26px; border-radius: 50%; background: #B9C6D8; transition: background 0.3s, box-shadow 0.3s; }
+    .rt-light[data-s="warn"] .rt-lamp { background: var(--lv2); box-shadow: 0 0 0 7px rgba(217,154,0,0.22); }
+    .rt-light b { display: block; }
+    .rt-light span { font-size: 0.85rem; color: var(--muted); }
+
+    .rt-result { margin-top: 18px; padding: 18px 20px; border-radius: 14px; background: var(--accent-soft); }
+    .rt-result b { display: block; color: var(--ink); }
+    .rt-result p { color: var(--accent-dark); font-size: 0.95rem; }
+
+    @media (max-width: 760px) {
+      .rt-grid, .rt-edge { grid-template-columns: 1fr; }
+      .rt-host { padding: 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .rt-box, .rt-esp, .rt-lamp { transition: none; }
+    }
+
     /* ----- 태블릿 / 모바일 ----- */
     @media (max-width: 960px) {
       .stack { grid-template-columns: repeat(2, 1fr); }
@@ -552,6 +622,7 @@
         <li><a href="#ai">AI 모델</a></li>
         <li><a href="#features">기능</a></li>
         <li><a href="#hardware">하드웨어</a></li>
+        <li><a href="#runtime">Edge 구조</a></li>
         <li><a href="#pipeline">파이프라인</a></li>
         <li><a href="#roi">사업성</a></li>
         <li><a href="#poc">PoC</a></li>
@@ -941,6 +1012,133 @@
           <li><b>멈춤도 알린다</b>ESP32가 Jetson 신호를 일정 시간 못 받으면 황색등을 켜 시스템 이상을 알립니다.</li>
         </ul>
         <p class="hw-source">※ 사양은 제조사·판매처 데이터시트 기준이며, 구매 전 정확한 모델로 다시 확인합니다.</p>
+      </div>
+    </section>
+
+    <!-- ===== Edge 런타임: Jetson 안의 컨테이너 구조 ===== -->
+    <section class="block" id="runtime">
+      <div class="wrap">
+        <span class="eyebrow">Edge runtime</span>
+        <h2>하나가 멈춰도,<br>경보는 멈추지 않게 나눴습니다</h2>
+        <p class="lead">Jetson 한 대 안의 소프트웨어를 "멈춰도 되는 것"과 "절대 멈추면 안 되는 것"으로 나눠 다섯 개 컨테이너로 돌립니다. AI가 멈춰도 열화상 감시와 경보는 계속되고, Jetson 전체가 멈추면 ESP32가 알립니다.</p>
+
+        <div class="rt-sim" role="group" aria-label="고장 상황 보기">
+          <button type="button" data-s="normal" aria-pressed="true">평소</button>
+          <button type="button" data-s="ai" aria-pressed="false">AI 추론이 멈추면</button>
+          <button type="button" data-s="net" aria-pressed="false">인터넷이 끊기면</button>
+          <button type="button" data-s="broker" aria-pressed="false">MQTT 브로커가 멈추면</button>
+          <button type="button" data-s="jetson" aria-pressed="false">Jetson 전체가 멈추면</button>
+        </div>
+
+        <div class="rt-host">
+          <div class="rt-host-head">
+            <b>Jetson Orin Nano Super 8GB</b>
+            <span class="mono">JetPack + Docker + NVIDIA Container Runtime · 1대당 RGB 3대 + 열화상 1대</span>
+          </div>
+          <ul class="rt-hw mono">
+            <li>GPU · TensorRT</li><li>NVMe</li><li>GbE · PoE 카메라 RTSP</li><li>USB-UART · ESP32 예비</li>
+          </ul>
+
+          <div class="rt-grid">
+            <article class="rt-box" data-id="vision" data-zone="soft">
+              <div class="rt-top"><span class="rt-num mono">01</span><span class="rt-zone">멈춰도 되는 구역</span></div>
+              <span class="rt-state"></span>
+              <h3 class="mono">vision-ai</h3>
+              <p>RTSP 영상 수신 → 전처리 → YOLOE · Pose · ByteTrack (TensorRT FP16)</p>
+              <div class="rt-io mono">pub: detect/fall · detect/object · hb/vision</div>
+              <ul class="rt-tags mono"><li>unprivileged</li><li>runtime: nvidia</li><li>mem_limit</li><li>restart: on-failure</li></ul>
+            </article>
+            <article class="rt-box" data-id="thermal" data-zone="net">
+              <div class="rt-top"><span class="rt-num mono">02</span><span class="rt-zone">AI 없이 도는 안전망</span></div>
+              <span class="rt-state"></span>
+              <h3 class="mono">thermal-guard</h3>
+              <p>FLIR A50 온도를 Modbus TCP로 읽어 절대 임계값으로 판단합니다.</p>
+              <div class="rt-io mono">pub: detect/thermal</div>
+              <ul class="rt-tags mono"><li>unprivileged</li><li>매우 가벼움</li><li>restart: always</li></ul>
+            </article>
+            <article class="rt-box wide" data-id="broker" data-zone="spine">
+              <div class="rt-top"><span class="rt-num mono">03</span><span class="rt-zone">시스템의 척추</span></div>
+              <span class="rt-state"></span>
+              <h3 class="mono">broker · Mosquitto MQTT</h3>
+              <p>컨테이너끼리, 그리고 ESP32와 결과만 주고받습니다. 현장 내부망 전용이라 밖으로 포트를 열지 않습니다.</p>
+              <ul class="rt-tags mono"><li>unprivileged</li><li>restart: always</li></ul>
+            </article>
+            <article class="rt-box" data-id="alarm" data-zone="hard">
+              <div class="rt-top"><span class="rt-num mono">04</span><span class="rt-zone">절대 멈추면 안 됨</span></div>
+              <span class="rt-state"></span>
+              <h3 class="mono">risk-alarm</h3>
+              <p>검출 결과를 여러 프레임 모아 Level 0~4로 판단하고 경보를 보냅니다. AI 하트비트가 끊기면 황색 경보를 냅니다.</p>
+              <div class="rt-io mono">sub: detect/* → pub: alarm/cmd · hb/edge (+ UART 예비)</div>
+              <ul class="rt-tags mono"><li>--device /dev/ttyUSB0</li><li>privileged 아님</li><li>CPU 코어 예약</li><li>restart: always</li></ul>
+            </article>
+            <article class="rt-box" data-id="uplink" data-zone="soft">
+              <div class="rt-top"><span class="rt-num mono">05</span><span class="rt-zone">멈춰도 되는 구역</span></div>
+              <span class="rt-state"></span>
+              <h3 class="mono">uplink</h3>
+              <p>이벤트는 FastAPI 서버로, 영상 클립은 NAS로 보냅니다. Web Push · SMS 알림의 출발점입니다.</p>
+              <div class="rt-io mono">sub: event/* → REST · NAS</div>
+              <ul class="rt-tags mono"><li>unprivileged</li><li>NVMe 오프라인 버퍼</li><li>restart: unless-stopped</li></ul>
+            </article>
+          </div>
+        </div>
+
+        <div class="rt-link"><span><span class="rt-mqtt">MQTT (Wi-Fi)</span> · <span class="rt-uart">UART 예비</span></span></div>
+
+        <div class="rt-edge">
+          <div class="rt-esp">
+            <span class="rt-state"></span>
+            <h3>ESP32 · 마지막 안전장치</h3>
+            <p>컨테이너 밖, 하드웨어에 둔 워치독입니다. Jetson의 하트비트(<span class="mono">hb/edge</span>)가 일정 시간 오지 않으면 스스로 황색등을 켭니다.</p>
+          </div>
+          <div class="rt-light" data-s="ok">
+            <span class="rt-lamp" aria-hidden="true"></span>
+            <div><b class="rt-light-label">꺼짐 · 이상 없음</b><span>PATLITE LR6 경광등</span></div>
+          </div>
+        </div>
+
+        <div class="rt-result" aria-live="polite">
+          <b class="rt-result-title">평소</b>
+          <p class="rt-result-text">다섯 컨테이너가 MQTT로 검출 결과(JSON)만 주고받습니다. 영상은 vision-ai 안에서만 처리합니다.</p>
+        </div>
+
+        <ul class="why">
+          <li><b>영상은 브로커에 싣지 않습니다</b>1080p 4채널을 MQTT로 보내면 Jetson이 버티지 못합니다. 영상은 한 컨테이너 안에서 처리하고 결과만 올립니다.</li>
+          <li><b>privileged 없이 돕니다</b>카메라가 IP 카메라라 장치 권한이 필요 없습니다. 여는 장치는 ESP32 예비용 UART 하나뿐입니다.</li>
+          <li><b>AI 없이 도는 안전망</b>화재 전조인 고온은 규칙만으로 잡을 수 있어, AI와 따로 돌려 AI가 멈춰도 감시합니다.</li>
+        </ul>
+
+        <h3 class="subhead">판단은 왜 Jetson Orin Nano인가요</h3>
+        <div class="table-wrap">
+          <table class="mtable">
+            <thead>
+              <tr><th>보드 (SBC)</th><th>AI 성능</th><th>장점</th><th>이 제품에서 걸리는 점</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Jetson Orin Nano Super 8GB</td><td class="pick">67 TOPS (GPU)</td><td class="how">영상 디코딩 하드웨어(NVDEC)와 TensorRT를 갖춰, 기존 PyTorch → ONNX → TensorRT 흐름을 그대로 씁니다.</td><td class="how">8GB를 CPU와 GPU가 함께 써서 메모리 제한(mem_limit)을 둡니다.</td></tr>
+              <tr><td>Raspberry Pi 5 + AI HAT+</td><td>26 TOPS (Hailo-8 NPU)</td><td class="how">저렴하고 자료가 많습니다.</td><td class="how">클래스를 바꿔 쓰는 YOLOE는 Hailo 변환이 어렵고, 4채널 디코딩에 CPU 부담이 큽니다.</td></tr>
+              <tr><td>RK3588 보드</td><td>6 TOPS (NPU)</td><td class="how">가격 대비 성능이 좋고 하드웨어 디코더가 있습니다.</td><td class="how">RKNN 변환이 까다롭고, 모델 3개를 동시에 돌리기엔 여유가 적습니다.</td></tr>
+              <tr><td>Jetson Orin NX 16GB</td><td>100 TOPS 이상</td><td class="how">메모리와 성능에 여유가 큽니다.</td><td class="how">가격이 높아 8개월 투자비 회수 계획에 불리합니다.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="model-note">※ PoC 시연(웹캠 1대, 낙상 감지 1종)은 Raspberry Pi 5로도 가능합니다. 현장 설치에는 같은 Orin Nano 모듈을 쓴 팬리스 산업용 캐리어 보드를 씁니다.</p>
+
+        <h3 class="subhead">경보는 왜 ESP32가 따로 맡나요</h3>
+        <p class="fine">경광등을 Jetson에 바로 연결하면, Jetson이 멈출 때 경보도 같이 멈춥니다. 그래서 펌웨어 하나만 도는 MCU가 경보를 맡고 Jetson이 살아 있는지도 지켜봅니다. 1초 안에 부팅되고, 스스로 멈추면 하드웨어 워치독이 다시 켭니다.</p>
+        <div class="table-wrap">
+          <table class="mtable">
+            <thead>
+              <tr><th>MCU</th><th>무선 · 로직</th><th>장점</th><th>이 제품에서 걸리는 점</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>ESP32-DevKitC</td><td class="pick">Wi-Fi 내장 · 3.3V</td><td class="how">Wi-Fi MQTT와 UART 예비 경로를 함께 씁니다. 값이 싸고 MQTT 예제가 많으며, Jetson과 로직 전압이 같습니다.</td><td class="how">공장 Wi-Fi가 불안정하면 끊길 수 있어 UART 예비 경로로 보완합니다.</td></tr>
+              <tr><td>STM32 Nucleo-F446RE</td><td>무선 없음 · 3.3V</td><td class="how">실시간성과 장기 안정성이 좋고, 독립 워치독과 CAN을 지원합니다.</td><td class="how">Jetson과 반드시 유선으로 연결해야 합니다. 무선을 쓸 수 없는 현장의 대안입니다.</td></tr>
+              <tr><td>Arduino Uno R4 WiFi</td><td>Wi-Fi 내장 · 5V</td><td class="how">5V 모듈 연결이 쉽고 교육 자료가 많습니다.</td><td class="how">칩이 둘이라 구조가 복잡하고, ESP32보다 비싸면서 이점이 적습니다.</td></tr>
+              <tr><td>Raspberry Pi Pico W</td><td>Wi-Fi 내장 · 3.3V</td><td class="how">매우 저렴하고 MicroPython으로 빠르게 만듭니다.</td><td class="how">MQTT·산업 현장 사례가 ESP32보다 적습니다.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="model-note">※ 자세한 비교와 선정 근거는 SBC·MCU 부품 선정 보고서, 컨테이너 배치는 Edge SBC·컨테이너 구조 보고서에 있습니다.</p>
       </div>
     </section>
 
@@ -1450,6 +1648,62 @@
     });
   });
   requestAnimationFrame(function () { show('p50'); });
+})();
+</script>
+<script>
+(function () {
+  /* Edge 구조: 고장 상황 보기 */
+  var scenes = {
+    normal: { title: '평소', light: 'ok', down: [], cover: {},
+      text: '다섯 컨테이너가 MQTT로 검출 결과(JSON)만 주고받습니다. 영상은 vision-ai 안에서만 처리합니다.' },
+    ai: { title: 'AI 추론이 멈추면', light: 'warn', down: ['vision'],
+      cover: { thermal: '계속 감시', alarm: 'AI 멈춤 감지' },
+      text: '낙상·위험물 감지는 잠시 멈추지만 열화상 감시는 그대로 돕니다. risk-alarm이 AI 하트비트 끊김을 보고 황색등을 켜고, vision-ai는 자동으로 다시 켜집니다.' },
+    net: { title: '인터넷이 끊기면', light: 'ok', down: [],
+      cover: { uplink: 'NVMe에 저장' },
+      text: '감지부터 경광등까지는 현장 안에서 끝나므로 경보는 그대로 울립니다. 이벤트와 영상 클립은 NVMe에 쌓아 두었다가 연결이 돌아오면 서버로 보냅니다.' },
+    broker: { title: 'MQTT 브로커가 멈추면', light: 'ok', down: ['broker'], uart: true,
+      cover: { alarm: 'UART로 전송' },
+      text: 'risk-alarm이 UART 예비 경로로 ESP32에 경보 명령을 직접 보냅니다. 브로커는 자동으로 다시 켜집니다.' },
+    jetson: { title: 'Jetson 전체가 멈추면', light: 'warn', down: ['vision', 'thermal', 'broker', 'alarm', 'uplink'],
+      cover: { esp: '하트비트 끊김 감지' },
+      text: 'ESP32가 Jetson 하트비트를 일정 시간 받지 못하면 스스로 황색등을 켜 시스템 이상을 알립니다. 컨테이너 밖, 하드웨어에 둔 마지막 안전장치입니다.' }
+  };
+  var lightLabel = { ok: '꺼짐 · 이상 없음', warn: '황색 · 시스템 이상' };
+
+  var btns = document.querySelectorAll('.rt-sim button');
+  var boxes = document.querySelectorAll('.rt-box');
+  var esp = document.querySelector('.rt-esp');
+  var light = document.querySelector('.rt-light');
+  if (!esp || !light) return;
+
+  function show(k) {
+    var s = scenes[k];
+    boxes.forEach(function (box) {
+      var id = box.dataset.id;
+      var isDown = s.down.indexOf(id) !== -1;
+      var cover = s.cover[id];
+      box.classList.toggle('down', isDown);
+      box.classList.toggle('cover', !!cover);
+      box.querySelector('.rt-state').textContent = isDown ? '멈춤' : (cover || '');
+    });
+    esp.classList.toggle('cover', !!s.cover.esp);
+    esp.querySelector('.rt-state').textContent = s.cover.esp || '';
+    light.dataset.s = s.light;
+    light.querySelector('.rt-light-label').textContent = lightLabel[s.light];
+    document.querySelector('.rt-mqtt').classList.toggle('on', !s.uart && k !== 'jetson');
+    document.querySelector('.rt-uart').classList.toggle('on', !!s.uart);
+    document.querySelector('.rt-result-title').textContent = s.title;
+    document.querySelector('.rt-result-text').textContent = s.text;
+  }
+
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      btns.forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+      show(btn.dataset.s);
+    });
+  });
+  show('normal');
 })();
 </script>
 <!-- 안내 챗봇 (Supabase Edge Function "chat", 홈페이지·PRD·보고서 기반 RAG) -->
