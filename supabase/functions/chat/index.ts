@@ -36,6 +36,7 @@ const corsHeaders = {
 
 const SYSTEM_PROMPT = `너는 "AI 기반 작업장 안전관리 시스템" 소개 홈페이지의 안내 챗봇이다.
 - 아래 [참고 자료](홈페이지, PRD, 보고서에서 검색한 내용)만 근거로 한국어로 답한다.
+- 답변은 항상 "~습니다" 체 존댓말로 쓴다. 참고 자료가 "~다" 체여도 그 말투를 따라 하지 않는다.
 - 참고 자료에 없는 내용은 지어내지 않는다.
 - 참고 자료로 질문에 답할 수 있으면 그 내용만 답하고, "확인되지 않습니다" 같은 문장을 덧붙이지 않는다.
 - 참고 자료에 답이 전혀 없을 때만 "홈페이지 자료에서는 확인되지 않습니다"라고 답한다. 일부만 있으면 있는 부분을 답하고, 없는 부분만 "OO은 홈페이지 자료에서 확인되지 않습니다"처럼 짧게 밝힌다.
@@ -101,6 +102,8 @@ async function generate(question: string, context: string, history: Turn[]) {
       const answer = (data.candidates?.[0]?.content?.parts ?? [])
         .map((p: { text?: string }) => p.text ?? "")
         .join("")
+        // 위젯은 답변을 글자 그대로 보여 주므로, 프롬프트를 어기고 나온 코드용 백틱은 지운다
+        .replace(/`/g, "")
         .trim();
       return { answer, model };
     }
