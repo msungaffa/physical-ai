@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>작업장 안전관리 · 모바일 관제 데모</title>
+  <meta name="theme-color" content="#F7F9FC">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
+  <style>
+    :root {
+      --bg: #F7F9FC; --ink: #131B2E; --muted: #55606E; --line: #DCE3EE;
+      --accent: #0284C7; --accent-dark: #006194; --accent-soft: #E3F2FB;
+      --surface: #FFFFFF; --dark: #131B2E;
+      --lv0: #1F9D6B; --lv1: #0284C7; --lv2: #D99A00; --lv3: #E8590C; --lv4: #D62839;
+      --glass: rgba(255,255,255,.78);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      font-family: "Pretendard", -apple-system, "Malgun Gothic", sans-serif;
+      background: radial-gradient(120% 60% at 80% -10%, #D8EEFB 0, rgba(247,249,252,0) 60%), var(--bg);
+      color: var(--ink); line-height: 1.5; word-break: keep-all;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .mono { font-family: "JetBrains Mono", ui-monospace, Consolas, monospace; }
+    .head-font { font-family: "Plus Jakarta Sans", "Pretendard", sans-serif; }
+
+    /* 상단 */
+    .top { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px 10px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand i { width: 34px; height: 34px; border-radius: 11px; background: linear-gradient(135deg, var(--accent-dark), #38BDF8); color: #fff; display: flex; align-items: center; justify-content: center; font-style: normal; font-weight: 800; font-size: .8rem; }
+    .brand b { display: block; font-size: .95rem; line-height: 1.2; }
+    .brand small { font-size: .68rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--lv0); box-shadow: 0 0 0 0 rgba(31,157,107,.5); animation: pulse 1.8s infinite; display: inline-block; }
+    @keyframes pulse { 70% { box-shadow: 0 0 0 7px rgba(31,157,107,0); } 100% { box-shadow: 0 0 0 0 rgba(31,157,107,0); } }
+    .bell { position: relative; width: 36px; height: 36px; border-radius: 50%; background: var(--glass); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: .95rem; cursor: pointer; }
+    .bell .badge { position: absolute; top: 5px; right: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--lv4); }
+    .bell.read .badge { display: none; }
+
+    .demo-note { margin: 0 16px 8px; font-size: .68rem; color: var(--muted); background: var(--accent-soft); border-radius: 8px; padding: 5px 10px; }
+
+    /* 본문 */
+    main { flex: 1; overflow-y: auto; padding: 4px 16px 18px; scrollbar-width: none; }
+    main::-webkit-scrollbar { display: none; }
+    .view { display: none; animation: fade .25s ease; }
+    .view.on { display: block; }
+    @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    h2.sec { font-size: .95rem; margin: 18px 0 10px; display: flex; justify-content: space-between; align-items: baseline; }
+    h2.sec small { font-weight: 500; font-size: .72rem; color: var(--muted); }
+
+    .glass { background: var(--glass); backdrop-filter: blur(14px); border: 1px solid rgba(186,230,253,.6); border-radius: 18px; box-shadow: 0 10px 30px -14px rgba(2,132,199,.25); }
+
+    .sum { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .sum .glass { padding: 11px 12px; }
+    .sum small { font-size: .66rem; color: var(--muted); display: block; }
+    .sum strong { font-size: 1.35rem; line-height: 1.25; }
+    .sum strong i { font-style: normal; font-size: .7rem; font-weight: 500; margin-left: 2px; }
+    .sum svg { display: block; margin-top: 4px; }
+
+    /* 지금 감지됨 카드 */
+    .alert { margin-top: 12px; padding: 14px; border-left: 4px solid var(--lv3); display: grid; gap: 10px; }
+    .alert.done { border-left-color: var(--lv0); }
+    .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; font-size: .7rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+    .pill.warn { color: var(--lv3); background: #FFF1E8; }
+    .pill.ok { color: var(--lv0); background: #E8F6F0; }
+    .alert.done .pill.warn { color: var(--lv0); background: #E8F6F0; }
+    .alert h3 { font-size: 1rem; line-height: 1.4; }
+    .alert p.sub { font-size: .8rem; color: var(--muted); margin-top: -4px; }
+    .feed {
+      aspect-ratio: 16 / 9; border-radius: 12px; position: relative; overflow: hidden;
+      background:
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px) 0 0 / 100% 25%,
+        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px) 0 0 / 12.5% 100%, #1B2540;
+    }
+    .feed .shelf { position: absolute; bottom: 0; width: 22%; height: 55%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); }
+    .feed .shelf.a { left: 4%; } .feed .shelf.b { right: 4%; }
+    .feed .person { position: absolute; left: 44%; bottom: 14%; width: 11%; height: 40%; border: 2px solid var(--lv0); border-radius: 5px; transition: all .6s ease; }
+    .feed .person.fall { height: 17%; width: 22%; left: 39%; border-color: var(--lv3); background: rgba(232,89,12,.16); }
+    .feed .tagc { position: absolute; font-size: .58rem; color: #fff; padding: 2px 7px; border-radius: 5px; background: rgba(0,0,0,.55); }
+    .feed .t1 { top: 8px; left: 8px; } .feed .t3 { bottom: 8px; right: 8px; }
+    .feed .t2 { bottom: 8px; left: 8px; background: var(--lv0); font-weight: 700; transition: background .3s; }
+    .feed .t2.fall { background: var(--lv3); }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .steps div { text-align: center; background: rgba(247,249,252,.9); border-radius: 10px; padding: 8px 2px; font-size: .68rem; color: var(--muted); border: 1px solid transparent; transition: all .3s; }
+    .steps div b { display: block; font-size: .78rem; color: var(--muted); }
+    .steps div.on { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
+    .steps div.on b { color: var(--accent-dark); }
+    .btns { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    button { font: inherit; cursor: pointer; border: 0; }
+    .btn { background: var(--accent-dark); color: #fff; font-weight: 700; font-size: .85rem; padding: 12px; border-radius: 12px; }
+    .btn:active { transform: scale(.98); }
+    .btn.ghost { background: var(--surface); color: var(--ink); border: 1px solid var(--line); padding: 12px 14px; font-weight: 600; }
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip { font-size: .68rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--muted); opacity: .45; transition: all .3s; }
+    .chip.on { opacity: 1; color: var(--ink); border-color: var(--lv0); }
+
+    /* 구역 */
+    .zones { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; scroll-snap-type: x mandatory; }
+    .zones::-webkit-scrollbar { display: none; }
+    .zone { flex: none; width: 150px; padding: 12px; scroll-snap-align: start; }
+    .zone b { display: flex; align-items: center; gap: 7px; font-size: .88rem; }
+    .zone b::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); }
+    .zone span { display: block; font-size: .74rem; color: var(--muted); margin-top: 4px; }
+    .zone em { font-style: normal; font-size: .7rem; font-weight: 700; color: var(--c); }
+
+    /* 열화상 */
+    .thermal { padding: 14px; }
+    .thermal .val { font-size: 1.9rem; font-weight: 700; color: var(--lv2); line-height: 1.1; }
+    .thermal .val small { font-size: .75rem; color: var(--muted); font-weight: 500; }
+    .thermal svg { width: 100%; height: 90px; margin-top: 8px; overflow: visible; }
+
+    /* 이벤트 목록 */
+    .ev { padding: 12px 14px; margin-bottom: 10px; cursor: pointer; }
+    .ev .row b { font-size: .88rem; }
+    .ev time { font-size: .7rem; color: var(--muted); }
+    .ev .detail { display: none; font-size: .78rem; color: var(--muted); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+    .ev.open .detail { display: block; }
+    .tag { font-size: .64rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; color: #fff; }
+    .lv0 { background: var(--lv0); } .lv2 { background: var(--lv2); } .lv3 { background: var(--lv3); } .lv4 { background: var(--lv4); }
+
+    /* 카메라 */
+    .cams { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .cam { padding: 8px; }
+    .cam .feed { border-radius: 10px; }
+    .cam b { display: block; font-size: .78rem; margin-top: 7px; }
+    .cam span { font-size: .68rem; color: var(--muted); }
+    .cam .feed .person { height: 36%; }
+
+    /* 리포트 */
+    .bars { display: flex; align-items: flex-end; gap: 10px; height: 130px; padding: 14px; }
+    .bars div { flex: 1; background: linear-gradient(to top, var(--accent), #7DD3FC); border-radius: 6px 6px 2px 2px; position: relative; }
+    .bars div span { position: absolute; bottom: -18px; left: 0; right: 0; text-align: center; font-size: .64rem; color: var(--muted); }
+    .bars-wrap { padding-bottom: 22px; }
+    .kv { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    .kv .glass { padding: 12px; }
+    .kv small { font-size: .68rem; color: var(--muted); display: block; }
+    .kv strong { font-size: 1.2rem; }
+
+    /* 설정 */
+    .set { padding: 4px 14px; }
+    .set label { display: flex; justify-content: space-between; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--line); font-size: .88rem; gap: 12px; cursor: pointer; }
+    .set label:last-child { border-bottom: 0; }
+    .set small { display: block; font-size: .72rem; color: var(--muted); }
+    .sw { appearance: none; width: 46px; height: 28px; border-radius: 999px; background: #CBD5E1; position: relative; transition: background .2s; flex: none; cursor: pointer; }
+    .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+    .sw:checked { background: var(--accent); }
+    .sw:checked::after { transform: translateX(18px); }
+
+    /* 탭바 */
+    nav.tabs { display: grid; grid-template-columns: repeat(5, 1fr); background: var(--glass); backdrop-filter: blur(16px); border-top: 1px solid var(--line); padding: 6px 0 calc(8px + env(safe-area-inset-bottom)); }
+    nav.tabs button { background: none; color: var(--muted); font-size: .66rem; padding: 6px 0; display: grid; gap: 2px; justify-items: center; }
+    nav.tabs button .ic { font-size: 1.15rem; line-height: 1; filter: grayscale(1); opacity: .7; }
+    nav.tabs button.on { color: var(--accent-dark); font-weight: 700; }
+    nav.tabs button.on .ic { filter: none; opacity: 1; }
+
+    .toast { position: fixed; left: 16px; right: 16px; bottom: 84px; background: var(--dark); color: #fff; font-size: .8rem; padding: 12px 14px; border-radius: 12px; transform: translateY(20px); opacity: 0; pointer-events: none; transition: all .25s; }
+    .toast.show { transform: none; opacity: 1; }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <i aria-hidden="true">AI</i>
+      <div><b class="head-font">작업장 안전관리</b><small>제1물류센터 <span class="dot" aria-hidden="true"></span> LIVE</small></div>
+    </div>
+    <button class="bell" id="bell" aria-label="알림 확인"><span aria-hidden="true">🔔</span><span class="badge"></span></button>
+  </header>
+  <p class="demo-note">※ 데모 화면입니다. 모든 숫자와 이벤트는 예시이며 실제 데이터가 아닙니다.</p>
+
+  <main>
+    <!-- 홈 -->
+    <section class="view on" id="v-home">
+      <div class="sum">
+        <div class="glass"><small>예방 사고</small><strong class="mono">37<i>건</i></strong>
+          <svg width="100%" height="18" viewBox="0 0 60 18" preserveAspectRatio="none"><polyline points="0,15 12,12 24,13 36,8 48,6 60,2" fill="none" stroke="#0284C7" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="glass"><small>평균 대응</small><strong class="mono">3.2<i>초</i></strong>
+          <svg width="100%" height="18" viewBox="0 0 60 18" preserveAspectRatio="none"><polyline points="0,3 12,5 24,8 36,9 48,13 60,15" fill="none" stroke="#1F9D6B" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="glass"><small>절감 추정</small><strong class="mono">1.8<i>억</i></strong>
+          <svg width="100%" height="18" viewBox="0 0 60 18" preserveAspectRatio="none"><polyline points="0,14 12,13 24,10 36,9 48,5 60,3" fill="none" stroke="#0284C7" stroke-width="2" stroke-linecap="round"/></svg></div>
+      </div>
+
+      <div class="glass alert" id="alert">
+        <div class="row"><span class="pill warn" id="pillState"><span class="dot" style="background:currentColor"></span><span id="pillText">지금 감지됨</span></span><span class="mono" style="font-size:.68rem;color:var(--muted)">CAM-B04</span></div>
+        <span class="pill ok" style="justify-self:start">감지부터 호출까지 3초</span>
+        <h3 class="head-font" id="alertTitle">B구역 메인 통로 · 작업자 낙상 의심</h3>
+        <p class="sub" id="alertSub">지게차 진입로 12m 지점에서 작업자가 쓰러진 자세로 감지되었습니다.</p>
+        <div class="feed" role="img" aria-label="통로 CCTV 화면 예시">
+          <div class="shelf a"></div><div class="shelf b"></div>
+          <div class="person" id="person"></div>
+          <span class="tagc t1 mono">LIVE · 30 FPS</span>
+          <span class="tagc t2 mono" id="feedState">WORKER</span>
+          <span class="tagc t3 mono" id="feedConf">신뢰도 --%</span>
+        </div>
+        <div class="steps" id="steps">
+          <div><b class="mono">00:00</b>낙상 포착</div>
+          <div><b class="mono">00:01</b>AI 판단</div>
+          <div><b class="mono">00:03</b>관리자 호출</div>
+        </div>
+        <div class="chips"><span class="chip" id="chipLight">경광등 작동됨</span><span class="chip" id="chipPush">푸시 알림 발송</span><span class="chip" id="chipLog">사건 기록됨</span></div>
+        <div class="btns"><button class="btn" id="btnCheck">현장 화면 확인</button><button class="btn ghost" id="btnReplay">↻ 다시 보기</button></div>
+      </div>
+
+      <h2 class="sec head-font">구역별 안전 현황 <small>스와이프 →</small></h2>
+      <div class="zones">
+        <div class="glass zone" style="--c: var(--lv0)"><b>A구역</b><span>지게차 동선 통제 양호</span><span class="mono">22.4°C · 14명</span><em>정상</em></div>
+        <div class="glass zone" style="--c: var(--lv4)"><b>B구역</b><span>안전요원 출동 진행</span><span class="mono">낙상 이벤트</span><em>조치 중</em></div>
+        <div class="glass zone" style="--c: var(--lv2)"><b>C구역</b><span>배전반 온도 상승</span><span class="mono">78.1°C</span><em>주의</em></div>
+        <div class="glass zone" style="--c: var(--lv0)"><b>D구역</b><span>안전모 착용 확인</span><span class="mono">23.0°C · 9명</span><em>정상</em></div>
+      </div>
+
+      <h2 class="sec head-font">열화상 설비 점검 <small>CAM-C02</small></h2>
+      <div class="glass thermal">
+        <div class="row"><b style="font-size:.85rem">C구역 제3배전반 변압기</b><span class="pill" style="background:#FFF7E0;color:var(--lv2)">기준 75°C 초과</span></div>
+        <div class="val mono" style="margin-top:8px">78.1°C <small>/ 5분 전 대비 +12°C</small></div>
+        <svg viewBox="0 0 280 90" preserveAspectRatio="none" aria-label="최근 15분 온도 추이">
+          <line x1="0" y1="30" x2="280" y2="30" stroke="#D62839" stroke-dasharray="4 4" opacity=".6"/>
+          <text x="278" y="24" font-size="9" fill="#D62839" text-anchor="end">기준 75°C</text>
+          <polyline points="0,72 40,70 80,66 120,62 160,56 200,46 240,28 280,16" fill="none" stroke="#D99A00" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="280" cy="16" r="4" fill="#D99A00"/>
+        </svg>
+        <div class="row mono" style="font-size:.66rem;color:var(--muted);margin-top:4px"><span>14:18 63°C</span><span>14:25 68°C</span><span>14:33 78.1°C</span></div>
+      </div>
+    </section>
+
+    <!-- 카메라 -->
+    <section class="view" id="v-cam">
+      <h2 class="sec head-font" style="margin-top:6px">카메라 <small>4대 연결 (예시)</small></h2>
+      <div class="cams">
+        <div class="glass cam"><div class="feed"><div class="shelf a"></div><div class="shelf b"></div><div class="person"></div><span class="tagc t1 mono">LIVE</span></div><b>CAM-A01</b><span>A구역 · 정상</span></div>
+        <div class="glass cam"><div class="feed"><div class="shelf a"></div><div class="shelf b"></div><div class="person fall"></div><span class="tagc t1 mono">ALERT</span></div><b>CAM-B04</b><span style="color:var(--lv4)">B구역 · 낙상 의심</span></div>
+        <div class="glass cam"><div class="feed"><div class="shelf a"></div><div class="person"></div><span class="tagc t1 mono">THERMAL</span></div><b>CAM-C02</b><span style="color:var(--lv2)">C구역 · 온도 주의</span></div>
+        <div class="glass cam"><div class="feed"><div class="shelf b"></div><div class="person"></div><span class="tagc t1 mono">LIVE</span></div><b>CAM-D03</b><span>D구역 · 정상</span></div>
+      </div>
+    </section>
+
+    <!-- 이벤트 -->
+    <section class="view" id="v-ev">
+      <h2 class="sec head-font" style="margin-top:6px">오늘의 이벤트 <small>눌러서 자세히</small></h2>
+      <div class="glass ev"><div class="row"><b>B구역 작업자 낙상 의심</b><time class="mono">14:32</time></div><div class="row" style="margin-top:6px"><span class="tag lv3">Level 3</span><span style="font-size:.72rem;color:var(--muted)">조치 중</span></div><p class="detail">경광등 작동, 관리자 호출 완료. 안전요원이 현장으로 이동 중입니다.</p></div>
+      <div class="glass ev"><div class="row"><b>A구역 지게차 통로 장애물</b><time class="mono">13:15</time></div><div class="row" style="margin-top:6px"><span class="tag lv2">Level 2</span><span style="font-size:.72rem;color:var(--muted)">조치 완료</span></div><p class="detail">화물 팔레트가 통로에 12초 이상 방치되어 안내 방송 후 이동되었습니다.</p></div>
+      <div class="glass ev"><div class="row"><b>C구역 배전반 고온</b><time class="mono">11:40</time></div><div class="row" style="margin-top:6px"><span class="tag lv2">Level 2</span><span style="font-size:.72rem;color:var(--muted)">사전 통보</span></div><p class="detail">기준 온도에 근접해 정기 점검 담당자에게 사전 알림을 보냈습니다.</p></div>
+      <div class="glass ev"><div class="row"><b>D구역 안전모 미착용</b><time class="mono">09:12</time></div><div class="row" style="margin-top:6px"><span class="tag lv0">Level 1</span><span style="font-size:.72rem;color:var(--muted)">착용 확인됨</span></div><p class="detail">현장 스피커로 음성 안내 후 15초 이내 착용이 확인되었습니다.</p></div>
+    </section>
+
+    <!-- 리포트 -->
+    <section class="view" id="v-rep">
+      <h2 class="sec head-font" style="margin-top:6px">주간 감지 건수 <small>예시</small></h2>
+      <div class="glass bars-wrap"><div class="bars">
+        <div style="height:45%"><span>월</span></div><div style="height:70%"><span>화</span></div><div style="height:38%"><span>수</span></div><div style="height:60%"><span>목</span></div><div style="height:30%"><span>금</span></div><div style="height:18%"><span>토</span></div><div style="height:25%"><span>일</span></div>
+      </div></div>
+      <div class="kv">
+        <div class="glass"><small>이번 주 이벤트</small><strong class="mono">21건</strong></div>
+        <div class="glass"><small>오경보로 표시</small><strong class="mono">1건</strong></div>
+        <div class="glass"><small>반복 위험 구역</small><strong class="mono">B구역</strong></div>
+        <div class="glass"><small>평균 대응 시간</small><strong class="mono">3.2초</strong></div>
+      </div>
+    </section>
+
+    <!-- 설정 -->
+    <section class="view" id="v-set">
+      <h2 class="sec head-font" style="margin-top:6px">알림 설정</h2>
+      <div class="glass set">
+        <label><span>푸시 알림<small>위험 이벤트를 즉시 받습니다</small></span><input class="sw" type="checkbox" checked></label>
+        <label><span>경광등·부저 연동<small>감지 시 현장 경고장치 작동</small></span><input class="sw" type="checkbox" checked></label>
+        <label><span>야간 알림<small>22:00 – 06:00에도 받기</small></span><input class="sw" type="checkbox"></label>
+        <label><span>Level 2 이상만 알림<small>낮은 단계 알림 숨기기</small></span><input class="sw" type="checkbox" checked></label>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabs" aria-label="하단 메뉴">
+    <button class="on" data-v="home"><span class="ic">🏠</span>홈</button>
+    <button data-v="cam"><span class="ic">📹</span>카메라</button>
+    <button data-v="ev"><span class="ic">⚠️</span>이벤트</button>
+    <button data-v="rep"><span class="ic">📊</span>리포트</button>
+    <button data-v="set"><span class="ic">⚙️</span>설정</button>
+  </nav>
+  <div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+  var $ = function (s) { return document.querySelector(s); };
+  var timers = [];
+  var toastTimer;
+
+  function toast(msg) {
+    var t = $('#toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2200);
+  }
+
+  // 탭 전환
+  document.querySelectorAll('nav.tabs button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('nav.tabs button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      document.querySelectorAll('.view').forEach(function (v) { v.classList.toggle('on', v.id === 'v-' + b.dataset.v); });
+      $('main').scrollTop = 0;
+    });
+  });
+
+  // 이벤트 펼치기
+  document.querySelectorAll('.ev').forEach(function (e) { e.addEventListener('click', function () { e.classList.toggle('open'); }); });
+
+  $('#bell').addEventListener('click', function () { this.classList.add('read'); toast('새 알림을 모두 확인했습니다'); });
+  $('#btnCheck').addEventListener('click', function () { toast('현장 라이브 화면으로 연결합니다 (데모)'); });
+
+  // 낙상 시나리오: 00:00 → 00:01 → 00:03
+  function setStep(n) {
+    document.querySelectorAll('#steps div').forEach(function (d, i) { d.classList.toggle('on', i < n); });
+  }
+  function reset() {
+    timers.forEach(clearTimeout); timers = [];
+    $('#alert').classList.remove('done');
+    $('#pillText').textContent = '정상 모니터링';
+    $('#pillState').className = 'pill ok';
+    $('#alertTitle').textContent = 'B구역 메인 통로';
+    $('#alertSub').textContent = '작업자가 정상 자세로 이동 중입니다.';
+    $('#person').className = 'person';
+    $('#feedState').className = 'tagc t2 mono'; $('#feedState').textContent = 'WORKER';
+    $('#feedConf').textContent = '신뢰도 --%';
+    setStep(0);
+    ['#chipLight', '#chipPush', '#chipLog'].forEach(function (c) { $(c).classList.remove('on'); });
+  }
+  function play() {
+    reset();
+    timers.push(setTimeout(function () {            // 00:00 낙상 포착
+      $('#pillText').textContent = '지금 감지됨'; $('#pillState').className = 'pill warn';
+      $('#alertTitle').textContent = 'B구역 메인 통로 · 작업자 낙상 의심';
+      $('#alertSub').textContent = '지게차 진입로 12m 지점에서 작업자가 쓰러진 자세로 감지되었습니다.';
+      $('#person').className = 'person fall';
+      $('#feedState').className = 'tagc t2 mono fall'; $('#feedState').textContent = 'FALL DETECTED';
+      setStep(1);
+    }, 900));
+    timers.push(setTimeout(function () {            // 00:01 AI 판단
+      $('#feedConf').textContent = '신뢰도 97%'; setStep(2); $('#chipLight').classList.add('on');
+    }, 1900));
+    timers.push(setTimeout(function () {            // 00:03 관리자 호출
+      setStep(3); $('#chipPush').classList.add('on'); $('#chipLog').classList.add('on');
+      $('#alert').classList.add('done'); $('#pillText').textContent = '관리자 호출 완료';
+      toast('관리자에게 알림을 보냈습니다');
+    }, 3900));
+  }
+  $('#btnReplay').addEventListener('click', play);
+  play();
+})();
+</script>
+</body>
+</html>

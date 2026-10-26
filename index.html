@@ -9,6 +9,8 @@
   <!-- 글꼴: Pretendard -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap">
+
   <style>
     /* ===== 색상 설정: 이 값만 바꿔도 전체 분위기가 바뀝니다 ===== */
     :root {
@@ -613,65 +615,21 @@
     .mobile .points { list-style: none; margin-top: 28px; display: grid; gap: 18px; }
     .mobile .points li { display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: start; }
     .mobile .points .ico {
-      width: 40px; height: 40px; border-radius: 10px; background: var(--accent-soft); color: var(--accent-dark);
+      width: 40px; height: 40px; border-radius: 12px; background: var(--accent-soft); color: var(--accent-dark);
       display: flex; align-items: center; justify-content: center; font-weight: 800;
     }
     .mobile .points b { display: block; }
     .mobile .points span { color: var(--muted); font-size: 0.95rem; }
-    .mobile .cta { margin-top: 32px; }
-    .phone-wrap { justify-self: center; }
+    .mobile .cta { margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .phone-wrap { justify-self: center; text-align: center; }
     .phone {
-      width: 320px; background: var(--dark); border-radius: 40px; padding: 10px;
-      box-shadow: 0 30px 60px -28px rgba(2, 132, 199, 0.5);
+      width: 340px; background: var(--dark); border-radius: 46px; padding: 10px;
+      box-shadow: 0 40px 70px -30px rgba(2, 132, 199, 0.55), 0 0 0 1px rgba(255,255,255,.06) inset;
     }
-    .phone .screen { background: var(--bg); border-radius: 31px; overflow: hidden; position: relative; }
-    .phone .body { height: 560px; overflow: hidden; padding: 14px 14px 0; position: relative; }
-    .phone .body::after {
-      content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
-      background: linear-gradient(to top, var(--bg), rgba(247, 249, 252, 0));
-    }
-    .phone .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .phone .top b { font-size: 0.9rem; line-height: 1.2; display: block; }
-    .phone .top small { font-size: 0.68rem; color: var(--muted); }
-    .phone .bell { position: relative; width: 30px; height: 30px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
-    .phone .bell::after { content: ""; position: absolute; top: 3px; right: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--lv4); }
-    .phone .sum { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-    .phone .sum div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; }
-    .phone .sum small { display: block; font-size: 0.62rem; color: var(--muted); line-height: 1.3; }
-    .phone .sum strong { font-size: 1.15rem; line-height: 1.2; }
-    .phone .sum strong i { font-style: normal; font-size: 0.65rem; font-weight: 500; margin-left: 1px; }
-    .phone .alert {
-      background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--lv3);
-      border-radius: 14px; padding: 12px; display: grid; gap: 9px; margin-bottom: 12px;
-    }
-    .phone .alert .row { display: flex; justify-content: space-between; align-items: center; }
-    .phone .alert .now { font-size: 0.66rem; font-weight: 700; color: var(--lv3); background: #FFF1E8; padding: 2px 9px; border-radius: 999px; }
-    .phone .alert .cam { font-size: 0.62rem; color: var(--muted); }
-    .phone .alert .quick { justify-self: start; font-size: 0.66rem; font-weight: 700; color: var(--lv0); background: #E8F6F0; padding: 2px 9px; border-radius: 999px; }
-    .phone .alert h4 { font-size: 0.92rem; line-height: 1.4; }
-    .phone .alert .view {
-      aspect-ratio: 16 / 9; border-radius: 10px; position: relative; overflow: hidden;
-      background:
-        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px) 0 0 / 100% 25%,
-        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px) 0 0 / 12.5% 100%,
-        #1B2540;
-    }
-    .phone .alert .view .p { position: absolute; left: 38%; bottom: 16%; width: 24%; height: 30%; border: 2px solid var(--lv3); border-radius: 4px; background: rgba(232, 89, 12, 0.15); }
-    .phone .alert .view span { position: absolute; font-size: 0.56rem; color: #fff; padding: 1px 6px; border-radius: 4px; background: rgba(0, 0, 0, 0.55); }
-    .phone .alert .view .l { top: 6px; left: 6px; }
-    .phone .alert .view .f { bottom: 6px; left: 6px; background: var(--lv3); font-weight: 700; }
-    .phone .alert .view .c { bottom: 6px; right: 6px; }
-    .phone .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; text-align: center; }
-    .phone .steps div { background: var(--bg); border-radius: 8px; padding: 6px 2px; font-size: 0.6rem; color: var(--muted); line-height: 1.3; }
-    .phone .steps b { display: block; font-size: 0.68rem; color: var(--accent-dark); }
-    .phone .btn { background: var(--accent-dark); color: #fff; text-align: center; font-size: 0.74rem; font-weight: 700; padding: 9px; border-radius: 10px; }
-    .phone .zones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .phone .zones div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; font-size: 0.68rem; color: var(--muted); }
-    .phone .zones b { display: flex; align-items: center; gap: 5px; color: var(--ink); font-size: 0.74rem; }
-    .phone .zones b::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
-    .phone .tabs { display: grid; grid-template-columns: repeat(5, 1fr); background: var(--surface); border-top: 1px solid var(--line); padding: 9px 0 11px; text-align: center; font-size: 0.6rem; color: var(--muted); }
-    .phone .tabs .on { color: var(--accent-dark); font-weight: 700; }
-    .phone-note { margin-top: 16px; text-align: center; font-size: 0.78rem; color: var(--muted); }
+    .phone iframe { display: block; width: 100%; height: 650px; border: 0; border-radius: 36px; background: var(--bg); }
+    .phone-note { margin-top: 16px; font-size: 0.78rem; color: var(--muted); }
+    .phone-open { margin-top: 12px; display: inline-block; font-size: 0.85rem; font-weight: 700; color: var(--accent-dark); text-decoration: none; border-bottom: 2px solid var(--accent-soft); }
+    .phone-open:hover { border-bottom-color: var(--accent); }
     @media (max-width: 960px) {
       .mobile { grid-template-columns: 1fr; gap: 40px; }
     }
@@ -679,6 +637,39 @@
       .phone { width: 100%; }
     }
 
+    /* ===== 디자인 레이어 (Stitch 시안의 유리 질감·글로우를 기존 내용 위에 입힘) ===== */
+    body {
+      background:
+        radial-gradient(900px 480px at 85% -80px, rgba(186, 230, 253, 0.55), rgba(247, 249, 252, 0) 70%),
+        radial-gradient(700px 400px at -5% 420px, rgba(167, 243, 208, 0.18), rgba(247, 249, 252, 0) 70%),
+        var(--bg);
+      background-attachment: fixed;
+    }
+    h1, section.block h2, .logo { font-family: "Plus Jakarta Sans", "Pretendard", sans-serif; }
+    .mono, .stats .num { font-family: "JetBrains Mono", ui-monospace, Consolas, monospace; }
+    header { background: rgba(255, 255, 255, 0.72); backdrop-filter: blur(16px); border-bottom-color: rgba(186, 230, 253, 0.6); }
+    .logo i { background: linear-gradient(135deg, var(--accent-dark), #38BDF8); box-shadow: 0 6px 14px -6px rgba(2, 132, 199, 0.6); }
+    .eyebrow {
+      padding: 4px 12px; border-radius: 999px; background: rgba(224, 242, 254, 0.8);
+      border: 1px solid rgba(186, 230, 253, 0.9); letter-spacing: 0.1em;
+    }
+    .hero h1 em { background: linear-gradient(90deg, var(--accent-dark), #06B6D4); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .button { background: linear-gradient(135deg, var(--accent-dark), var(--accent)); box-shadow: 0 12px 28px -12px rgba(2, 132, 199, 0.65); transition: transform .15s ease, box-shadow .15s ease; }
+    .button:hover { background: linear-gradient(135deg, #004B73, var(--accent-dark)); transform: translateY(-1px); }
+    .button.ghost { background: rgba(255, 255, 255, 0.75); color: var(--ink); border: 1px solid rgba(2, 132, 199, 0.35); box-shadow: none; backdrop-filter: blur(8px); }
+    .button.ghost:hover { background: var(--accent-soft); color: var(--ink); }
+    .console { background: linear-gradient(160deg, #16223D, #0E1730); border: 1px solid rgba(56, 189, 248, 0.25); box-shadow: 0 30px 60px -28px rgba(2, 132, 199, 0.55); }
+    .stats { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
+    .card {
+      background: rgba(255, 255, 255, 0.78); backdrop-filter: blur(12px);
+      border: 1px solid rgba(186, 230, 253, 0.65); border-radius: 18px;
+      box-shadow: 0 10px 30px -16px rgba(2, 132, 199, 0.22);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .card:hover { transform: translateY(-3px); border-color: rgba(56, 189, 248, 0.7); box-shadow: 0 20px 40px -18px rgba(2, 132, 199, 0.35); }
+    .alt .card { background: rgba(247, 249, 252, 0.85); }
+    section.block.alt { background: linear-gradient(180deg, #FFFFFF, #F4F9FD); }
+    @media (prefers-reduced-motion: reduce) { .card, .button { transition: none; } .card:hover, .button:hover { transform: none; } }
   </style>
 </head>
 <body>
@@ -714,6 +705,7 @@
         <div class="cta">
           <a class="button" href="#how">작동 방식 보기</a>
           <a class="button ghost" href="#ai">어떤 AI를 쓰나요?</a>
+          <a class="button ghost" href="#mobile">📱 모바일 관제 체험</a>
         </div>
       </div>
 
@@ -854,52 +846,15 @@
             </li>
           </ul>
 
-          <div class="cta"><a class="button" href="#features">기능 자세히 보기</a></div>
+          <div class="cta"><a class="button" href="mobile.html" target="aetherMobile" onclick="return openPhone(event)">📱 모바일 창으로 체험하기</a><a class="button ghost" href="#features">기능 자세히 보기</a></div>
         </div>
 
         <div class="phone-wrap">
-          <div class="phone" role="img" aria-label="낙상 감지 알림, 구역별 상태, 요약 지표가 보이는 모바일 관제 화면 예시">
-            <div class="screen" aria-hidden="true">
-              <div class="body">
-                <div class="top">
-                  <div><b>작업장 안전관리</b><small>제1물류센터 · <span class="live">LIVE</span></small></div>
-                  <span class="bell">🔔</span>
-                </div>
-
-                <div class="sum">
-                  <div><small>예방 사고</small><strong class="mono">37<i>건</i></strong></div>
-                  <div><small>평균 대응</small><strong class="mono">3.2<i>초</i></strong></div>
-                  <div><small>절감 추정</small><strong class="mono">1.8<i>억</i></strong></div>
-                </div>
-
-                <div class="alert">
-                  <div class="row"><span class="now">● 지금 감지됨</span><span class="cam mono">CAM-B04</span></div>
-                  <span class="quick">감지부터 호출까지 3초</span>
-                  <h4>B구역 메인 통로 · 작업자 낙상 의심</h4>
-                  <div class="view">
-                    <div class="p"></div>
-                    <span class="l mono">LIVE</span>
-                    <span class="f mono">FALL DETECTED</span>
-                    <span class="c mono">신뢰도 97%</span>
-                  </div>
-                  <div class="steps">
-                    <div><b class="mono">00:00</b>낙상 포착</div>
-                    <div><b class="mono">00:01</b>AI 판단</div>
-                    <div><b class="mono">00:03</b>관리자 호출</div>
-                  </div>
-                  <div class="btn">현장 화면 확인</div>
-                </div>
-
-                <div class="zones">
-                  <div style="--c: var(--lv0)"><b>A구역</b>정상</div>
-                  <div style="--c: var(--lv4)"><b>B구역</b>조치 중</div>
-                  <div style="--c: var(--lv2)"><b>C구역</b>온도 주의</div>
-                </div>
-              </div>
-              <div class="tabs"><span class="on">홈</span><span>카메라</span><span>이벤트</span><span>리포트</span><span>설정</span></div>
-            </div>
+          <div class="phone">
+            <iframe src="mobile.html" title="모바일 관제 화면 데모 (직접 눌러볼 수 있습니다)" loading="lazy"></iframe>
           </div>
-          <p class="phone-note">※ 이해를 돕기 위한 화면 예시이며, 숫자는 실제 데이터가 아닙니다.</p>
+          <p class="phone-note">※ 직접 눌러볼 수 있는 데모입니다. 숫자는 실제 데이터가 아닌 예시입니다.</p>
+          <a class="phone-open" href="mobile.html" target="aetherMobile" onclick="return openPhone(event)">📱 모바일 창으로 따로 열기 ↗</a>
         </div>
       </div>
     </section>
@@ -1853,6 +1808,15 @@
 </script>
 <!-- 안내 챗봇 (Supabase Edge Function "chat", 홈페이지·PRD·보고서 기반 RAG) -->
 <script>window.CHATBOT_ENDPOINT = "https://irnmlsgccbvbhsrdxaad.supabase.co/functions/v1/chat";</script>
+<script>
+  /* 모바일 데모를 폰 크기의 별도 창으로 연다. 팝업이 막히면 링크가 그대로 새 탭에서 열린다. */
+  function openPhone(e) {
+    var w = window.open('mobile.html', 'aetherMobile',
+      'width=410,height=860,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=no');
+    if (w) { w.focus(); if (e && e.preventDefault) e.preventDefault(); return false; }
+    return true;
+  }
+</script>
 <!-- chatbot.js를 고치면 ?v= 숫자를 올려 브라우저 캐시를 갱신한다 -->
 <script src="chatbot.js?v=5" defer></script>
 </body>
